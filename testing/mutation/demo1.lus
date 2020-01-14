@@ -1,0 +1,12 @@
+node demo1 () returns (Prop1: bool; d: bool);
+var
+    L1, L2, L3, L4: bool;
+let
+    L1 = L2 or L3;
+    L2 = true;
+    L3 = not L2;
+    L4 = not L1;
+    Prop1 = L1;
+    d = L4;
+    --%PROPERTY Prop1;
+tel

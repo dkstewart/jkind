@@ -65,7 +65,10 @@ public class Yices2Solver extends SmtLib2Solver {
 	private String readCore() {
 		String line = "";
 		try {
-			line = fromSolver.readLine();
+			do {
+				line += fromSolver.readLine();
+			} while (!line.endsWith(")"));
+			
 			comment(getSolverName() + ": " + line);
 		} catch (IOException e) {
 			e.printStackTrace();

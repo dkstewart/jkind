@@ -1,0 +1,15 @@
+node demo2 (a1, a2: int) returns (Prop1, Prop2, Prop3, Prop4: bool; b: int);
+var
+  d: bool;
+let
+  d = (a1 > 0);
+  b = if d or (a2 < 0) then a1 else a2;
+  Prop1 = (b = a1 or b = a2);
+  Prop2 = ((a1 > 0) => b = a1);
+  Prop3 = ((a2 < 0) => b = a1);
+  Prop4 = (((a1 <= 0) and (a2 >= 0)) => b = a2);
+  --%PROPERTY Prop1;
+  --%PROPERTY Prop2;
+  --%PROPERTY Prop3;
+  --%PROPERTY Prop4;
+tel;

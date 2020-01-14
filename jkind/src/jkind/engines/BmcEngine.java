@@ -9,6 +9,7 @@ import jkind.engines.messages.InductiveCounterexampleMessage;
 import jkind.engines.messages.InvalidMessage;
 import jkind.engines.messages.InvariantMessage;
 import jkind.engines.messages.Itinerary;
+import jkind.engines.messages.MutationMessage;
 import jkind.engines.messages.UnknownMessage;
 import jkind.engines.messages.ValidMessage;
 import jkind.solvers.Model;
@@ -30,7 +31,7 @@ public class BmcEngine extends SolverBasedEngine {
 	public void main() {
 		createVariables(-1);
 		for (int k = 0; k < settings.n; k++) {
-			comment("K = " + (k + 1));
+			comment("BMC K = " + (k + 1));
 			processMessages();
 			if (properties.isEmpty()) {
 				return;
@@ -119,5 +120,9 @@ public class BmcEngine extends SolverBasedEngine {
 	protected void handleMessage(ValidMessage vm) {
 		properties.removeAll(vm.valid);
 		validProperties.addAll(vm.valid);
+	}
+
+	@Override
+	protected void handleMessage(MutationMessage vm) {
 	}
 }

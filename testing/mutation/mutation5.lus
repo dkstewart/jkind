@@ -1,0 +1,12 @@
+node filter () returns (c:bool; Prop1: bool);
+var
+  a, b: bool;
+let
+  a = true;
+  b = not a;
+  c = a or b;
+
+  Prop1 = c;
+  
+  --%PROPERTY Prop1;
+tel;

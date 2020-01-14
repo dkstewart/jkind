@@ -1,0 +1,15 @@
+node select (x: bool; a1, a2: real) returns (res: real; Prop1, Prop2, Prop3: bool);
+let
+   res = if x then a1 else a2;
+   
+   Prop1 = (res = a1 or res = a2);
+   Prop2 = (x => res = a1);
+   Prop3 = (not x => res = a2);
+   
+   --%MAIN
+   -- %PROPERTY Prop1;
+   --%PROPERTY Prop2;
+   --%PROPERTY Prop3;
+   
+   -- des qu'on selectione une propriété IVC donne b mais il faut au moins prop2 et prop3 pour passer la mutation   
+tel;

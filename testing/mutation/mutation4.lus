@@ -1,0 +1,15 @@
+node select (x, y: bool; a1, a2: real) returns (res: real; Prop1, Prop2, Prop3, Prop4: bool);
+let
+   res = if (x and y) then a1 else a2;
+   
+   Prop1 = (x and y => res = a1);
+   Prop2 = (not x and not y => res = a2);
+   Prop3 = (not x => res = a2);
+   Prop4 = (not y => res = a2);
+   
+   --%MAIN
+   --%PROPERTY Prop1;
+   -- %PROPERTY Prop2;
+   --%PROPERTY Prop3;
+   --%PROPERTY Prop4;
+tel;

@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jkind.JKindSettings;
+import jkind.engines.mutation.Mutation;
 import jkind.lustre.Expr;
+import jkind.lustre.Location;
 import jkind.lustre.Type;
 import jkind.lustre.VarDecl;
 import jkind.lustre.values.BooleanValue;
@@ -189,5 +192,9 @@ public class XmlWriter extends Writer {
 		out.println("    <K>" + k + "</K>");
 		out.println("  </Property>");
 		out.flush();
+	}
+
+	@Override
+	public void writeMutation(Map<Location, List<Mutation>> location_mutations, double runTime, JKindSettings settings) {		
 	}
 }

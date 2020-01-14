@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jkind.JKindSettings;
+import jkind.engines.mutation.Mutation;
+import jkind.engines.mutation.Mutation.Verdict;
 import jkind.lustre.Expr;
+import jkind.lustre.Location;
 import jkind.results.Counterexample;
 import jkind.results.layout.Layout;
 import jkind.util.Util;
@@ -93,5 +97,41 @@ public class ConsoleWriter extends Writer {
 	@Override
 	public void writeInconsistent(String prop, String source, int k, double runtime) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void writeMutation(Map<Location, List<Mutation>> location_mutations, double startTime, JKindSettings settings) {
+		writeLine();
+		
+		int surv = 0, kill = 0, unkn = 0;
+		
+		for (Location loc : location_mutations.keySet())
+			for (Mutation mut : location_mutations.get(loc))
+				if (mut.verdict == Verdict.KILLED) {
+					kill++;
+					System.out.println("KILLED" + " at " + mut.location + " " + mut.description + " by " + mut.killing_properties + " at k = " + mut.killing_k);
+				}
+		
+		for (Location loc : location_mutations.keySet())
+			for (Mutation mut : location_mutations.get(loc))
+				if (mut.verdict == Verdict.UNKNOWN) {
+					unkn++;
+					System.out.println("UNKNOWN" + " at " + mut.location + " " + mut.description + " surviving to " + mut.surviving_properties);
+				}
+		
+		for (Location loc : location_mutations.keySet())
+			for (Mutation mut : location_mutations.get(loc))
+				if (mut.verdict == Verdict.SURVIVED) {
+					surv++;
+					System.out.println("SURVIVED" + " at " + mut.location + " " + mut.description);
+				}
+		
+		writeLine();
+		System.out.println("MUTATION +++ k-ind widening: " + settings.kIndWidening + ", killing k: " 
+							+ settings.kKill + ", parrallel tasks: " + settings.parallelMutants);
+ 		System.out.println("SURVIVED : " + surv + ", KILLED :" + kill + ", UNKNOWN :" + unkn 
+							+ ", running time :" + Util.secondsToTime((System.currentTimeMillis() - startTime) / 1000.0));
+		writeLine();
+
 	}
 }

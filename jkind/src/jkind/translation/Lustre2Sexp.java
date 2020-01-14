@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import jkind.lustre.ArrayAccessExpr;
 import jkind.lustre.ArrayExpr;
 import jkind.lustre.ArrayUpdateExpr;
+import jkind.lustre.Ast;
 import jkind.lustre.BinaryExpr;
 import jkind.lustre.BoolExpr;
 import jkind.lustre.CastExpr;
@@ -47,18 +49,20 @@ public class Lustre2Sexp implements ExprVisitor<Sexp> {
 	}
 
 	public static Relation constructTransitionRelation(Node node) {
-		return constructGeneralTransitionRelation(node, Collections.emptyList());
+		return constructGeneralTransitionRelation(node, Collections.emptyMap());
 	}
 
-	public static Relation constructIvcTransitionRelation(Node node) {
-		return constructGeneralTransitionRelation(node, node.ivc);
+	public static Relation constructIvcTransitionRelation(Node node, Map<String, Symbol> ivcMap) {
+		return constructGeneralTransitionRelation(node, ivcMap);
+	}
+	
+	public static Relation constructMutationTransitionRelation(String str, Node node, Map<Ast, Symbol> mutationMap) {
+		return constructDistributedTransitionRelation(str, node, mutationMap);
 	}
 
-	private static Relation constructGeneralTransitionRelation(Node node, List<String> ivc) {
+	private static Relation constructGeneralTransitionRelation(Node node, Map<String, Symbol> ivcMap) {
 		Lustre2Sexp visitor = new Lustre2Sexp(1);
 		List<Sexp> conjuncts = new ArrayList<>();
-
-		LinkedBiMap<String, Symbol> ivcMap = createIvcMap(ivc);
 
 		for (Equation eq : node.equations) {
 			Sexp body = eq.expr.accept(visitor);
@@ -82,6 +86,37 @@ public class Lustre2Sexp implements ExprVisitor<Sexp> {
 		inputs.addAll(visitor.curr(Util.getVarDecls(node)));
 		return new Relation(Relation.T, inputs, SexpUtil.conjoin(conjuncts));
 	}
+	
+	private static Relation constructDistributedTransitionRelation(String str, Node node, Map<Ast, Symbol> mutationMap) {
+		Lustre2Sexp visitor = new Lustre2Sexp(1);
+		List<Sexp> conjuncts = new ArrayList<>();
+
+		Sexp sexp = null;
+
+		for (Ast ast : mutationMap.keySet()) {
+			
+			if (ast instanceof Equation) {
+				Equation eq = (Equation) ast;
+				Sexp body = eq.expr.accept(visitor);
+				Sexp head = eq.lhs.get(0).accept(visitor);
+				sexp = new Cons("=", head, body);
+			}
+			else {
+				Expr as = (Expr) ast;
+				sexp = as.accept(visitor);
+			}
+			
+			if (mutationMap.containsKey(ast))
+				sexp = new Cons("=>", ((Symbol) mutationMap.get(ast)), sexp);
+			conjuncts.add(sexp);
+		}
+
+		List<VarDecl> inputs = new ArrayList<>();
+		inputs.add(new VarDecl(INIT.str, NamedType.BOOL));
+		inputs.addAll(visitor.pre(Util.getVarDecls(node)));
+		inputs.addAll(visitor.curr(Util.getVarDecls(node)));
+		return new Relation(str, inputs, SexpUtil.conjoin(conjuncts));
+	}
 
 	public static LinkedBiMap<String, Symbol> createIvcMap(List<String> ivc) {
 		LinkedBiMap<String, Symbol> ivcMap = new LinkedBiMap<>();
@@ -91,7 +126,7 @@ public class Lustre2Sexp implements ExprVisitor<Sexp> {
 		}
 		return ivcMap;
 	}
-
+	
 	private Symbol curr(String id) {
 		return new StreamIndex(id, index).getEncoded();
 	}

@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jkind.JKindSettings;
+import jkind.engines.mutation.Mutation;
 import jkind.excel.ExcelFormatter;
 import jkind.lustre.Expr;
+import jkind.lustre.Location;
 import jkind.lustre.Node;
 import jkind.results.Counterexample;
 import jkind.results.InconsistentProperty;
@@ -78,5 +81,9 @@ public class ExcelWriter extends Writer {
 	@Override
 	public void writeInconsistent(String prop, String source, int k, double runtime) {
 		properties.add(new InconsistentProperty(prop, source, k, runtime));
+	}
+
+	@Override
+	public void writeMutation(Map<Location, List<Mutation>> location_mutations, double runTime, JKindSettings settings) {		
 	}
 }

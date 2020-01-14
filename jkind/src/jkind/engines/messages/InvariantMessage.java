@@ -7,14 +7,19 @@ import jkind.lustre.Expr;
 import jkind.util.Util;
 
 public class InvariantMessage extends Message {
+	public final String source;
 	public final List<Expr> invariants;
+	public final int k;
 
-	public InvariantMessage(List<Expr> invs) {
+
+	public InvariantMessage(String source, List<Expr> invs, int k) {
+		this.source = source;
 		this.invariants = Util.safeList(invs);
+		this.k = k;
 	}
 
-	public InvariantMessage(Expr invariant) {
-		this(Collections.singletonList(invariant));
+	public InvariantMessage(String source, Expr invariant, int k) {
+		this(source, Collections.singletonList(invariant), k);
 	}
 
 	@Override

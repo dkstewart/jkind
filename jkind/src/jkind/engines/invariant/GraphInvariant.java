@@ -222,5 +222,6 @@ public class GraphInvariant implements StructuredInvariant {
 
 	@Override
 	public void reduceProven(StructuredInvariant proven) {
+		// TODO : same invariants may be sent many times		
 	}
 }

@@ -11,6 +11,7 @@ import jkind.lustre.ArrayType;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.IdExpr;
+import jkind.lustre.Location;
 import jkind.lustre.Node;
 import jkind.lustre.Program;
 import jkind.lustre.RecordAccessExpr;
@@ -78,29 +79,30 @@ public class FlattenCompoundVariables extends AstMapVisitor {
 		for (Equation eq : equations) {
 			IdExpr lhs = eq.lhs.get(0);
 			Type type = originalTypes.get(lhs.id);
-			result.addAll(flattenLeftHandSide(lhs, eq.expr, type));
+			result.addAll(flattenLeftHandSide(eq.location, lhs, eq.expr, type));
 		}
 		return result;
 	}
 
-	private static List<Equation> flattenLeftHandSide(Expr lhs, Expr rhs, Type type) {
+	// STA : keep locations
+	private static List<Equation> flattenLeftHandSide(Location loc, Expr lhs, Expr rhs, Type type) {
 		List<Equation> result = new ArrayList<>();
 		if (type instanceof ArrayType) {
 			ArrayType arrayType = (ArrayType) type;
 			for (int i = 0; i < arrayType.size; i++) {
 				Expr accessLhs = new ArrayAccessExpr(lhs, i);
 				Expr accessRhs = new ArrayAccessExpr(rhs, i);
-				result.addAll(flattenLeftHandSide(accessLhs, accessRhs, arrayType.base));
+				result.addAll(flattenLeftHandSide(loc, accessLhs, accessRhs, arrayType.base));
 			}
 		} else if (type instanceof RecordType) {
 			RecordType recordType = (RecordType) type;
 			for (Entry<String, Type> entry : recordType.fields.entrySet()) {
 				Expr accessLhs = new RecordAccessExpr(lhs, entry.getKey());
 				Expr accessRhs = new RecordAccessExpr(rhs, entry.getKey());
-				result.addAll(flattenLeftHandSide(accessLhs, accessRhs, entry.getValue()));
+				result.addAll(flattenLeftHandSide(loc, accessLhs, accessRhs, entry.getValue()));
 			}
 		} else {
-			result.add(new Equation(new IdExpr(lhs.toString()), rhs));
+			result.add(new Equation(loc, new IdExpr(lhs.toString()), rhs));
 		}
 		return result;
 	}

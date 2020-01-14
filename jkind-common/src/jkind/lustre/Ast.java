@@ -18,6 +18,11 @@ public abstract class Ast {
 		accept(visitor);
 		return visitor.toString();
 	}
+	
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
+	}
 
 	public abstract <T, S extends T> T accept(AstVisitor<T, S> visitor);
 }

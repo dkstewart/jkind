@@ -12,6 +12,7 @@ import jkind.lustre.BinaryExpr;
 import jkind.lustre.BinaryOp;
 import jkind.lustre.Expr;
 import jkind.lustre.IdExpr;
+import jkind.lustre.Location;
 import jkind.lustre.RecordAccessExpr;
 import jkind.lustre.RecordType;
 import jkind.lustre.Type;
@@ -51,7 +52,7 @@ public class CompoundUtil {
 		for (VarDecl varDecl : varDecls) {
 			IdExpr id = new IdExpr(varDecl.id);
 			for (ExprType et : flattenExpr(id, varDecl.type)) {
-				result.add(new VarDecl(et.expr.toString(), et.type));
+				result.add(new VarDecl(et.expr.toString(), et.type, varDecl.originalType)); // Adding the original type before inlining
 			}
 		}
 		return result;
@@ -65,10 +66,10 @@ public class CompoundUtil {
 		return result;
 	}
 
-	public static List<Expr> mapBinary(BinaryOp op, List<Expr> exprs1, List<Expr> exprs2) {
+	public static List<Expr> mapBinary(Location loc, BinaryOp op, List<Expr> exprs1, List<Expr> exprs2) {
 		List<Expr> result = new ArrayList<>();
 		for (int i = 0; i < exprs1.size(); i++) {
-			result.add(new BinaryExpr(exprs1.get(i), op, exprs2.get(i)));
+			result.add(new BinaryExpr(loc, exprs1.get(i), op, exprs2.get(i)));
 		}
 		return result;
 	}

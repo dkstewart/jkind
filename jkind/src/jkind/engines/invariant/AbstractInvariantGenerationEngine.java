@@ -12,6 +12,7 @@ import jkind.engines.messages.InductiveCounterexampleMessage;
 import jkind.engines.messages.InvalidMessage;
 import jkind.engines.messages.InvariantMessage;
 import jkind.engines.messages.Itinerary;
+import jkind.engines.messages.MutationMessage;
 import jkind.engines.messages.UnknownMessage;
 import jkind.engines.messages.ValidMessage;
 import jkind.lustre.Expr;
@@ -44,7 +45,7 @@ public abstract class AbstractInvariantGenerationEngine extends SolverBasedEngin
 		createVariables(-1);
 		createVariables(0);
 		for (int k = 1; k <= settings.n; k++) {
-			comment("K = " + k);
+			comment("INVGEN K = " + k);
 
 			refineBaseStep(k - 1, invariant);
 			if (invariant.isTrivial()) {
@@ -118,7 +119,7 @@ public abstract class AbstractInvariantGenerationEngine extends SolverBasedEngin
 		List<Expr> newInvariants = invariant.toFinalInvariants();
 		provenInvariants.addAll(newInvariants);
 		sendValidProperties(newInvariants, k);
-		sendInvariants(newInvariants);
+		sendInvariants(newInvariants,k);
 
 		original.reduceProven(invariant);
 		return;
@@ -165,13 +166,13 @@ public abstract class AbstractInvariantGenerationEngine extends SolverBasedEngin
 		}
 	}
 
-	private void sendInvariants(List<Expr> newInvariants) {
+	private void sendInvariants(List<Expr> newInvariants, int k) {
 		comment("Sending invariants:");
 		for (Expr inv : newInvariants) {
 			comment("  " + inv);
 		}
 
-		director.broadcast(new InvariantMessage(newInvariants));
+		director.broadcast(new InvariantMessage(getName(), newInvariants, k));
 	}
 
 	@Override
@@ -199,5 +200,9 @@ public abstract class AbstractInvariantGenerationEngine extends SolverBasedEngin
 	@Override
 	protected void handleMessage(ValidMessage vm) {
 		properties.removeAll(vm.valid);
+	}
+	
+	@Override
+	protected void handleMessage(MutationMessage vm) {
 	}
 }

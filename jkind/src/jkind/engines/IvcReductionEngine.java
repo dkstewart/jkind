@@ -15,6 +15,7 @@ import jkind.engines.messages.InductiveCounterexampleMessage;
 import jkind.engines.messages.InvalidMessage;
 import jkind.engines.messages.InvariantMessage;
 import jkind.engines.messages.Itinerary;
+import jkind.engines.messages.MutationMessage;
 import jkind.engines.messages.UnknownMessage;
 import jkind.engines.messages.ValidMessage;
 import jkind.lustre.Expr;
@@ -32,14 +33,23 @@ import jkind.translation.Lustre2Sexp;
 import jkind.translation.Specification;
 import jkind.util.LinkedBiMap;
 import jkind.util.SexpUtil;
+import jkind.util.Util;
 
 public class IvcReductionEngine extends SolverBasedEngine {
 	public static final String NAME = "ivc-reduction";
 	private final LinkedBiMap<String, Symbol> ivcMap;
 
-	public IvcReductionEngine(Specification spec, JKindSettings settings, Director director) {
-		super(NAME, spec, settings, director);
-		ivcMap = Lustre2Sexp.createIvcMap(spec.node.ivc);
+	public IvcReductionEngine(Specification specif, JKindSettings settings, Director director) {
+		super(NAME, specif, settings, director);
+		
+		List<String> newIvc = new ArrayList<>(spec.node.ivc);
+		if(settings.allAssigned){
+			newIvc = new ArrayList<>();
+			newIvc.addAll(Util.getIds(spec.node.locals));
+			newIvc.addAll(Util.getIds(spec.node.outputs));
+		}
+		
+		ivcMap = Lustre2Sexp.createIvcMap(newIvc);
 	}
 
 	@Override
@@ -51,7 +61,7 @@ public class IvcReductionEngine extends SolverBasedEngine {
 			solver.define(new VarDecl(e.str, NamedType.BOOL));
 		}
 		solver.declare(spec.functions);
-		solver.define(spec.getIvcTransitionRelation());
+		solver.define(spec.getIvcTransitionRelation(ivcMap));
 		solver.define(new VarDecl(INIT.str, NamedType.BOOL));
 	}
 
@@ -151,7 +161,7 @@ public class IvcReductionEngine extends SolverBasedEngine {
 	}
 
 	private void reduceIvc(Expr property, int k, List<Expr> invariants, ValidMessage vm) {
-		if (spec.node.ivc.isEmpty()) {
+		if (ivcMap.isEmpty()) {
 			sendValid(property.toString(), k, invariants, Collections.emptySet(), vm);
 			return;
 		}
@@ -290,5 +300,9 @@ public class IvcReductionEngine extends SolverBasedEngine {
 		if (vm.getNextDestination() == EngineType.IVC_REDUCTION) {
 			reduce(vm);
 		}
+	}
+
+	@Override
+	protected void handleMessage(MutationMessage vm) {
 	}
 }

@@ -84,6 +84,6 @@ public class FlattenCompoundExpressions extends AstMapVisitor {
 		Expr cond = e.cond.accept(new FlattenCompoundExpressions());
 		Expr thenExpr = e.thenExpr.accept(this);
 		Expr elseExpr = e.elseExpr.accept(this);
-		return new IfThenElseExpr(cond, thenExpr, elseExpr);
+		return new IfThenElseExpr(e.location, cond, thenExpr, elseExpr);
 	}
 }

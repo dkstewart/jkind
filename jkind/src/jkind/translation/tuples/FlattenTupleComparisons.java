@@ -25,7 +25,7 @@ public class FlattenTupleComparisons extends AstMapVisitor {
 		if (isTupleComparison(e)) {
 			TupleExpr left = (TupleExpr) e.left.accept(this);
 			TupleExpr right = (TupleExpr) e.right.accept(this);
-			TupleExpr tuple = TupleUtil.mapBinary(BinaryOp.EQUAL, left, right);
+			TupleExpr tuple = TupleUtil.mapBinary(e.location, BinaryOp.EQUAL, left, right);
 			Expr equal = LustreUtil.and(tuple.elements);
 			if (e.op == BinaryOp.EQUAL) {
 				return equal;

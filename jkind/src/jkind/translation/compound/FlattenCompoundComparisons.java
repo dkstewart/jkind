@@ -36,7 +36,7 @@ public class FlattenCompoundComparisons extends TypeAwareAstMapVisitor {
 				List<Expr> leftExprs = CompoundUtil.mapExprs(leftExprTypes);
 				List<Expr> rightExprs = CompoundUtil.mapExprs(rightExprTypes);
 
-				List<Expr> exprs = CompoundUtil.mapBinary(BinaryOp.EQUAL, leftExprs, rightExprs);
+				List<Expr> exprs = CompoundUtil.mapBinary(e.location, BinaryOp.EQUAL, leftExprs, rightExprs);
 				Expr equal = LustreUtil.and(exprs);
 				if (e.op == BinaryOp.EQUAL) {
 					return equal;

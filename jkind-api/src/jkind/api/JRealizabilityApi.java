@@ -23,7 +23,7 @@ public class JRealizabilityApi {
 	private boolean extendCounterexample = false;
 	private boolean reduce = false;
 	private DebugLogger debug = new DebugLogger();
-	
+    	
 	private List<String> vmArgs = Collections.emptyList();
 
 	private String jkindJar;
@@ -104,7 +104,7 @@ public class JRealizabilityApi {
 	public void setEnvironment(String key, String value) {
 		environment.put(key, value);
 	}
-	
+    	
 	/**
 	 * Set VM args
 	 */

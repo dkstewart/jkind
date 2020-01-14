@@ -1,0 +1,18 @@
+node foo (x, y: real) returns (a: real);
+let
+   a = x + y;
+tel;
+
+node filter (x: real) returns (y: real; Prop1, Prop2: bool);
+var
+   a, b: real;
+let
+   a = foo(x, 0.0 -> pre y);
+   b = if a >= 0.0 then a else -a;
+   y = b + (0.0 -> pre y);
+   
+   Prop1 = (y >= 0.0);
+   Prop2 = (y >= b and y >= 0.0);
+   --%PROPERTY Prop1;
+   -- %PROPERTY Prop2;
+tel;

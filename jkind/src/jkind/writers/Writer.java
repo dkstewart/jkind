@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jkind.JKindSettings;
+import jkind.engines.mutation.Mutation;
 import jkind.lustre.Expr;
+import jkind.lustre.Location;
 import jkind.results.Counterexample;
 
 public abstract class Writer {
@@ -25,4 +28,6 @@ public abstract class Writer {
 
 	// Used only by JRealiability
 	public abstract void writeInconsistent(String prop, String source, int k, double runtime);
+	
+	public abstract void writeMutation(Map<Location, List<Mutation>> location_mutations, double runTime, JKindSettings settings);
 }

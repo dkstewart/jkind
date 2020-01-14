@@ -28,9 +28,11 @@ import jkind.engines.messages.InvariantMessage;
 import jkind.engines.messages.Itinerary;
 import jkind.engines.messages.Message;
 import jkind.engines.messages.MessageHandler;
+import jkind.engines.messages.MutationMessage;
 import jkind.engines.messages.StopMessage;
 import jkind.engines.messages.UnknownMessage;
 import jkind.engines.messages.ValidMessage;
+import jkind.engines.mutation.MutationEngine;
 import jkind.engines.pdr.PdrEngine;
 import jkind.lustre.Expr;
 import jkind.results.Counterexample;
@@ -198,6 +200,10 @@ public class Director extends MessageHandler {
 		if (settings.readAdvice != null) {
 			addEngine(new AdviceEngine(analysisSpec, settings, this, inputAdvice));
 		}
+		
+		if (settings.mutation) {
+			addEngine(new MutationEngine(analysisSpec, settings, this));
+		}
 	}
 
 	private void addEngine(Engine engine) {
@@ -338,6 +344,11 @@ public class Director extends MessageHandler {
 			inductiveCounterexamples.put(property, icm);
 		}
 	}
+	
+	@Override
+	protected void handleMessage(MutationMessage mutm) {
+		writer.writeMutation(mutm.location_mutations, mutm.startTime, settings);
+	}
 
 	private final Map<String, Integer> bmcUnknowns = new HashMap<>();
 	private final Set<String> kInductionUnknowns = new HashSet<>();
@@ -422,6 +433,9 @@ public class Director extends MessageHandler {
 		List<EngineType> destinations = new ArrayList<>();
 		if (settings.reduceIvc) {
 			destinations.add(EngineType.IVC_REDUCTION);
+		}
+		if (settings.mutation) {
+			destinations.add(EngineType.MUTATION);
 		}
 		return new Itinerary(destinations);
 	}

@@ -61,7 +61,9 @@ public abstract class SolverBasedEngine extends Engine {
 	/** Utility */
 
 	protected void comment(String str) {
+		if (settings.debug) System.out.println(str); // STA : debug
 		solver.comment(str);
+
 	}
 
 	protected void createVariables(int k) {

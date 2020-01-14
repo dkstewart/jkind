@@ -15,6 +15,7 @@ import jkind.engines.messages.InvalidMessage;
 import jkind.engines.messages.InvariantMessage;
 import jkind.engines.messages.Itinerary;
 import jkind.engines.messages.Message;
+import jkind.engines.messages.MutationMessage;
 import jkind.engines.messages.UnknownMessage;
 import jkind.engines.messages.ValidMessage;
 import jkind.lustre.Expr;
@@ -45,7 +46,7 @@ public class KInductionEngine extends SolverBasedEngine {
 	public void main() {
 		createVariables(-1);
 		for (kCurrent = 0; kCurrent <= settings.n; kCurrent++) {
-			comment("K = " + kCurrent);
+			comment("K-IND K = " + kCurrent);
 			processMessagesAndWait();
 			pruneUnknownProperties(kCurrent);
 			createVariables(kCurrent);
@@ -188,5 +189,9 @@ public class KInductionEngine extends SolverBasedEngine {
 	protected void handleMessage(ValidMessage vm) {
 		properties.removeAll(vm.valid);
 		addPropertiesAsInvariants(kCurrent - 1, vm.valid);
+	}
+
+	@Override
+	protected void handleMessage(MutationMessage vm) {
 	}
 }
