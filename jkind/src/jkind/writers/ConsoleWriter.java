@@ -2,6 +2,7 @@ package jkind.writers;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -102,36 +103,55 @@ public class ConsoleWriter extends Writer {
 	@Override
 	public void writeMutation(Map<Location, List<Mutation>> location_mutations, double startTime, JKindSettings settings) {
 		writeLine();
-		
+
 		int surv = 0, kill = 0, unkn = 0;
-		
-		for (Location loc : location_mutations.keySet())
-			for (Mutation mut : location_mutations.get(loc))
+
+		for (Location loc : location_mutations.keySet()) {
+			for (Mutation mut : location_mutations.get(loc)) {
 				if (mut.verdict == Verdict.KILLED) {
 					kill++;
 					System.out.println("KILLED" + " at " + mut.location + " " + mut.description + " by " + mut.killing_properties + " at k = " + mut.killing_k);
 				}
-		
-		for (Location loc : location_mutations.keySet())
-			for (Mutation mut : location_mutations.get(loc))
+			}
+		}
+
+		for (Location loc : location_mutations.keySet()) {
+			for (Mutation mut : location_mutations.get(loc)) {
 				if (mut.verdict == Verdict.UNKNOWN) {
 					unkn++;
 					System.out.println("UNKNOWN" + " at " + mut.location + " " + mut.description + " surviving to " + mut.surviving_properties);
 				}
-		
-		for (Location loc : location_mutations.keySet())
-			for (Mutation mut : location_mutations.get(loc))
+			}
+		}
+
+		for (Location loc : location_mutations.keySet()) {
+			for (Mutation mut : location_mutations.get(loc)) {
 				if (mut.verdict == Verdict.SURVIVED) {
 					surv++;
 					System.out.println("SURVIVED" + " at " + mut.location + " " + mut.description);
 				}
-		
+			}
+		}
+
 		writeLine();
-		System.out.println("MUTATION +++ k-ind widening: " + settings.kIndWidening + ", killing k: " 
+		System.out.println("MUTATION +++ k-ind widening: " + settings.kIndWidening + ", killing k: "
 							+ settings.kKill + ", parrallel tasks: " + settings.parallelMutants);
- 		System.out.println("SURVIVED : " + surv + ", KILLED :" + kill + ", UNKNOWN :" + unkn 
+ 		System.out.println("SURVIVED : " + surv + ", KILLED :" + kill + ", UNKNOWN :" + unkn
 							+ ", running time :" + Util.secondsToTime((System.currentTimeMillis() - startTime) / 1000.0));
 		writeLine();
 
+	}
+
+	@Override
+	public void writeNodeInputMutation(HashMap<Expr, Mutation> node_input_mutations) {
+		writeLine();
+
+		for (Expr ex : node_input_mutations.keySet()) {
+			if (node_input_mutations.get(ex).verdict == Verdict.KILLED) {
+				System.out.println("KILLED: Node input: " + ex.toString() + " at location: "
+						+ node_input_mutations.get(ex).location);
+			}
+		}
+		writeLine();
 	}
 }

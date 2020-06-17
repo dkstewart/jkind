@@ -29,12 +29,14 @@ import jkind.engines.messages.Itinerary;
 import jkind.engines.messages.Message;
 import jkind.engines.messages.MessageHandler;
 import jkind.engines.messages.MutationMessage;
+import jkind.engines.messages.NodeInputMutationMessage;
 import jkind.engines.messages.StopMessage;
 import jkind.engines.messages.UnknownMessage;
 import jkind.engines.messages.ValidMessage;
 import jkind.engines.mutation.MutationEngine;
 import jkind.engines.pdr.PdrEngine;
 import jkind.lustre.Expr;
+import jkind.lustre.Program;
 import jkind.results.Counterexample;
 import jkind.results.layout.NodeLayout;
 import jkind.solvers.Model;
@@ -53,6 +55,7 @@ public class Director extends MessageHandler {
 	private final JKindSettings settings;
 	private final Specification userSpec;
 	private final Specification analysisSpec;
+	private Program program;
 	private final Writer writer;
 	private final long startTime;
 
@@ -68,7 +71,31 @@ public class Director extends MessageHandler {
 	private Advice inputAdvice;
 	private AdviceWriter adviceWriter;
 
+	public Director(JKindSettings settings, Specification userSpec, Specification analysisSpec, Program program) {
+		this.program = null;
+		this.settings = settings;
+		this.userSpec = userSpec;
+		this.analysisSpec = analysisSpec;
+		this.program = program;
+
+		this.writer = getWriter();
+		this.startTime = System.currentTimeMillis();
+		this.remainingProperties.addAll(analysisSpec.node.properties);
+
+		if (settings.readAdvice != null) {
+			this.inputAdvice = AdviceReader.read(settings.readAdvice);
+		}
+
+		if (settings.writeAdvice != null) {
+			this.adviceWriter = new AdviceWriter(settings.writeAdvice);
+			this.adviceWriter.addVarDecls(Util.getVarDecls(analysisSpec.node));
+		}
+
+		initializeUnknowns(settings, analysisSpec.node.properties);
+	}
+
 	public Director(JKindSettings settings, Specification userSpec, Specification analysisSpec) {
+		this.program = null;
 		this.settings = settings;
 		this.userSpec = userSpec;
 		this.analysisSpec = analysisSpec;
@@ -200,9 +227,9 @@ public class Director extends MessageHandler {
 		if (settings.readAdvice != null) {
 			addEngine(new AdviceEngine(analysisSpec, settings, this, inputAdvice));
 		}
-		
+
 		if (settings.mutation) {
-			addEngine(new MutationEngine(analysisSpec, settings, this));
+			addEngine(new MutationEngine(analysisSpec, settings, this, program));
 		}
 	}
 
@@ -344,10 +371,15 @@ public class Director extends MessageHandler {
 			inductiveCounterexamples.put(property, icm);
 		}
 	}
-	
+
 	@Override
 	protected void handleMessage(MutationMessage mutm) {
 		writer.writeMutation(mutm.location_mutations, mutm.startTime, settings);
+	}
+
+	@Override
+	protected void handleMessage(NodeInputMutationMessage mutm) {
+		writer.writeNodeInputMutation(mutm.node_input_mutations);
 	}
 
 	private final Map<String, Integer> bmcUnknowns = new HashMap<>();

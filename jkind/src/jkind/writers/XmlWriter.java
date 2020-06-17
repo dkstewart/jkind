@@ -3,6 +3,7 @@ package jkind.writers;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -195,6 +196,10 @@ public class XmlWriter extends Writer {
 	}
 
 	@Override
-	public void writeMutation(Map<Location, List<Mutation>> location_mutations, double runTime, JKindSettings settings) {		
+	public void writeMutation(Map<Location, List<Mutation>> location_mutations, double runTime, JKindSettings settings) {
+	}
+
+	@Override
+	public void writeNodeInputMutation(HashMap<Expr, Mutation> node_input_mutations) {
 	}
 }

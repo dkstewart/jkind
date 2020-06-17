@@ -16,6 +16,7 @@ import jkind.engines.messages.InvariantMessage;
 import jkind.engines.messages.Itinerary;
 import jkind.engines.messages.Message;
 import jkind.engines.messages.MutationMessage;
+import jkind.engines.messages.NodeInputMutationMessage;
 import jkind.engines.messages.UnknownMessage;
 import jkind.engines.messages.ValidMessage;
 import jkind.lustre.Expr;
@@ -193,5 +194,9 @@ public class KInductionEngine extends SolverBasedEngine {
 
 	@Override
 	protected void handleMessage(MutationMessage vm) {
+	}
+
+	@Override
+	protected void handleMessage(NodeInputMutationMessage vm) {
 	}
 }

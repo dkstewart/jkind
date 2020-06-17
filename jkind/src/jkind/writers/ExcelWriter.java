@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,6 +85,10 @@ public class ExcelWriter extends Writer {
 	}
 
 	@Override
-	public void writeMutation(Map<Location, List<Mutation>> location_mutations, double runTime, JKindSettings settings) {		
+	public void writeMutation(Map<Location, List<Mutation>> location_mutations, double runTime, JKindSettings settings) {
+	}
+
+	@Override
+	public void writeNodeInputMutation(HashMap<Expr, Mutation> node_input_mutations) {
 	}
 }

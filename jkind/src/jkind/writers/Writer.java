@@ -1,5 +1,6 @@
 package jkind.writers;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,8 @@ public abstract class Writer {
 
 	// Used only by JRealiability
 	public abstract void writeInconsistent(String prop, String source, int k, double runtime);
-	
+
 	public abstract void writeMutation(Map<Location, List<Mutation>> location_mutations, double runTime, JKindSettings settings);
+
+	public abstract void writeNodeInputMutation(HashMap<Expr, Mutation> node_input_mutations);
 }

@@ -60,7 +60,9 @@ public abstract class MessageHandler {
 	protected void handleMessage(StopMessage sm) {
 		throw new StopException();
 	}
-	
+
 	protected abstract void handleMessage(MutationMessage vm);
-	
+
+	protected abstract void handleMessage(NodeInputMutationMessage vm);
+
 }

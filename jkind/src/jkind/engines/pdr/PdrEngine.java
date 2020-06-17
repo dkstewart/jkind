@@ -14,6 +14,7 @@ import jkind.engines.messages.InductiveCounterexampleMessage;
 import jkind.engines.messages.InvalidMessage;
 import jkind.engines.messages.InvariantMessage;
 import jkind.engines.messages.MutationMessage;
+import jkind.engines.messages.NodeInputMutationMessage;
 import jkind.engines.messages.UnknownMessage;
 import jkind.engines.messages.ValidMessage;
 import jkind.translation.Specification;
@@ -106,6 +107,10 @@ public class PdrEngine extends Engine {
 	}
 
 	@Override
-	protected void handleMessage(MutationMessage vm) {		
+	protected void handleMessage(MutationMessage vm) {
+	}
+
+	@Override
+	protected void handleMessage(NodeInputMutationMessage vm) {
 	}
 }

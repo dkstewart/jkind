@@ -1,0 +1,205 @@
+type Base_Types__Boolean = bool;
+type Base_Types__Unsigned = int;
+type Base_Types__Unsigned_64 = int;
+type Base_Types__Unsigned_32 = int;
+type Base_Types__Unsigned_16 = int;
+type Base_Types__Unsigned_8 = int;
+type Base_Types__Integer = int;
+type Base_Types__Integer_64 = int;
+type Base_Types__Integer_32 = int;
+type Base_Types__Integer_16 = int;
+type Base_Types__Integer_8 = int;
+type Base_Types__Float = real;
+type Base_Types__Float_32 = real;
+type Base_Types__Float_64 = real;
+
+node _TOP__temp(
+  __ASSUME__HIST : bool;
+  env_temp : int;
+  time : real;
+  fault__trigger__temp__fault_1 : bool;
+  fault__trigger__temp__fault_2 : bool;
+  temp__fault_2__fail_val : int;
+  __fault__nominal__temp_reading : int;
+  __fault__nominal__high_temp_indicator : bool;
+  high_temp_indicator : bool;
+  temp_reading : int
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+  freshVar2 : bool;
+  freshVar1 : bool;
+  freshVar0 : bool;
+  temp__fault_1__node__val_out : bool;
+  temp__fault_2__node__val_out : int;
+let
+  __GUARANTEE0 = (((env_temp > 8) = __fault__nominal__high_temp_indicator) and (env_temp = __fault__nominal__temp_reading));
+
+  __ASSERT = ((high_temp_indicator = (if fault__trigger__temp__fault_1 then temp__fault_1__node__val_out else __fault__nominal__high_temp_indicator)) and ((temp_reading = (if fault__trigger__temp__fault_2 then temp__fault_2__node__val_out else __fault__nominal__temp_reading)) and (__ASSUME__HIST => __GUARANTEE0)));
+
+  freshVar2 = (env_temp = __fault__nominal__temp_reading);
+
+  freshVar1 = (env_temp > 8);
+
+  freshVar0 = ((env_temp > 8) = __fault__nominal__high_temp_indicator);
+
+  temp__fault_1__node__val_out = Common_Faults__stuck_true(__fault__nominal__high_temp_indicator, fault__trigger__temp__fault_1);
+
+  temp__fault_2__node__val_out = Common_Faults__fail_to_int(__fault__nominal__temp_reading, temp__fault_2__fail_val, fault__trigger__temp__fault_2);
+
+  --%IVC freshVar2, freshVar1, freshVar0;
+
+tel;
+
+node main(
+  temp__high_temp_indicator : bool;
+  temp__temp_reading : int;
+  temp____ASSUME__HIST : bool;
+  temp_read : int;
+  temp_high : bool;
+  temp__env_temp : int;
+  temp__time : real;
+  temp__fault__trigger__temp__fault_1 : bool;
+  temp__fault__trigger__temp__fault_2 : bool;
+  temp__temp__fault_2__fail_val : int;
+  temp____fault__nominal__temp_reading : int;
+  temp____fault__nominal__high_temp_indicator : bool;
+  env_temp : int;
+  time : real;
+  __fault__event__temp__temp__fault_1 : bool;
+  __fault__dependently__active__temp__temp__fault_1 : bool;
+  __fault__event__temp__temp__fault_2 : bool;
+  __fault__dependently__active__temp__temp__fault_2 : bool
+) returns (
+
+);
+var
+  __ASSUME0 : bool;
+  __ASSUME__HIST : bool;
+  __GUARANTEE0 : bool;
+  freshVar2 : bool;
+  freshVar1 : bool;
+  freshVar0 : bool;
+  __fault__independently__active__temp__temp__fault_1 : bool;
+  __fault__independently__active__temp__temp__fault_2 : bool;
+let
+  --%MAIN;
+  __ASSUME0 = ((env_temp > 0) and (env_temp < 10));
+
+  __ASSUME__HIST = (temp____ASSUME__HIST and true);
+
+  __GUARANTEE0 = (((env_temp > 8) = temp_high) and (env_temp = temp_read));
+
+  freshVar2 = (env_temp = temp_read);
+
+  freshVar1 = (env_temp > 8);
+
+  freshVar0 = ((env_temp > 8) = temp_high);
+
+  __fault__independently__active__temp__temp__fault_1 = false;
+
+  __fault__independently__active__temp__temp__fault_2 = false;
+
+  assert __ASSUME0;
+
+  assert (time = temp__time);
+
+  assert _TOP__temp(temp____ASSUME__HIST, temp__env_temp, temp__time, temp__fault__trigger__temp__fault_1, temp__fault__trigger__temp__fault_2, temp__temp__fault_2__fail_val, temp____fault__nominal__temp_reading, temp____fault__nominal__high_temp_indicator, temp__high_temp_indicator, temp__temp_reading);
+
+  assert (temp____ASSUME__HIST = __HIST(true));
+
+  assert (env_temp = temp__env_temp);
+
+  assert (temp__temp_reading = temp_read);
+
+  assert (temp__high_temp_indicator = temp_high);
+
+  assert (__fault__independently__active__temp__temp__fault_1 = (__fault__event__temp__temp__fault_1 -> (__fault__event__temp__temp__fault_1 or (pre __fault__independently__active__temp__temp__fault_1))));
+
+  assert (__fault__dependently__active__temp__temp__fault_1 = (false -> (false or (pre __fault__dependently__active__temp__temp__fault_1))));
+
+  assert (temp__fault__trigger__temp__fault_1 = (__fault__independently__active__temp__temp__fault_1 or __fault__dependently__active__temp__temp__fault_1));
+
+  assert (__fault__independently__active__temp__temp__fault_2 = (__fault__event__temp__temp__fault_2 -> (__fault__event__temp__temp__fault_2 or (pre __fault__independently__active__temp__temp__fault_2))));
+
+  assert (__fault__dependently__active__temp__temp__fault_2 = (false -> (false or (pre __fault__dependently__active__temp__temp__fault_2))));
+
+  assert (temp__fault__trigger__temp__fault_2 = (__fault__independently__active__temp__temp__fault_2 or __fault__dependently__active__temp__temp__fault_2));
+
+  assert true;
+
+  assert (((time = 0.0) -> (time > (pre time))) and (true -> (time = ((pre time) + (time - (pre time))))));
+
+  --%PROPERTY __ASSUME__HIST;
+  --%PROPERTY __GUARANTEE0;
+
+  --%IVC freshVar2, freshVar1, freshVar0, __fault__independently__active__temp__temp__fault_1, __fault__independently__active__temp__temp__fault_2;
+
+tel;
+
+node Common_Faults__stuck_true(
+  val_in : bool;
+  trigger : bool
+) returns (
+  val_out : bool
+);
+let
+  val_out = (if trigger then true else val_in);
+
+tel;
+
+node Common_Faults__fail_to_int(
+  val_in : int;
+  alt_val : int;
+  trigger : bool
+) returns (
+  val_out : int
+);
+let
+  val_out = (if trigger then alt_val else val_in);
+
+tel;
+
+node __HIST(
+  input : bool
+) returns (
+  hist : bool
+);
+let
+  hist = (input -> ((pre hist) and input));
+
+tel;
+
+node __MinPos(
+  a : real;
+  b : real
+) returns (
+  ret : real
+);
+let
+  ret = (if (a <= 0.0) then b else (if (b <= 0.0) then a else (if (a <= b) then a else b)));
+
+tel;
+
+node __Rise(
+  input : bool
+) returns (
+  output : bool
+);
+let
+  output = (input -> ((pre (not input)) and input));
+
+tel;
+
+node __Fall(
+  input : bool
+) returns (
+  output : bool
+);
+let
+  output = ((not input) -> ((pre input) and (not input)));
+
+tel;
+

@@ -10,6 +10,7 @@ import jkind.engines.messages.InvalidMessage;
 import jkind.engines.messages.InvariantMessage;
 import jkind.engines.messages.Itinerary;
 import jkind.engines.messages.MutationMessage;
+import jkind.engines.messages.NodeInputMutationMessage;
 import jkind.engines.messages.UnknownMessage;
 import jkind.engines.messages.ValidMessage;
 import jkind.solvers.Model;
@@ -124,5 +125,9 @@ public class BmcEngine extends SolverBasedEngine {
 
 	@Override
 	protected void handleMessage(MutationMessage vm) {
+	}
+
+	@Override
+	protected void handleMessage(NodeInputMutationMessage vm) {
 	}
 }

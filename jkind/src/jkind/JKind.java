@@ -1,6 +1,7 @@
 package jkind;
 
 import java.util.ArrayList;
+
 import jkind.analysis.LinearChecker;
 import jkind.analysis.StaticAnalyzer;
 import jkind.engines.Director;
@@ -38,7 +39,8 @@ public class JKind {
 			Specification userSpec = new Specification(newProgram, settings.slicing); // userSpec with constants and types
 			Specification analysisSpec = getAnalysisSpec(userSpec, settings);
 
-			int exitCode = new Director(settings, userSpec, analysisSpec).run();
+//			int exitCode = new Director(settings, userSpec, analysisSpec).run();
+			int exitCode = new Director(settings, userSpec, analysisSpec, program).run();
 			System.exit(exitCode); // Kills all threads
 		} catch (Throwable t) {
 			t.printStackTrace();

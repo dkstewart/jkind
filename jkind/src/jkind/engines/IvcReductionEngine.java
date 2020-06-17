@@ -16,6 +16,7 @@ import jkind.engines.messages.InvalidMessage;
 import jkind.engines.messages.InvariantMessage;
 import jkind.engines.messages.Itinerary;
 import jkind.engines.messages.MutationMessage;
+import jkind.engines.messages.NodeInputMutationMessage;
 import jkind.engines.messages.UnknownMessage;
 import jkind.engines.messages.ValidMessage;
 import jkind.lustre.Expr;
@@ -41,14 +42,14 @@ public class IvcReductionEngine extends SolverBasedEngine {
 
 	public IvcReductionEngine(Specification specif, JKindSettings settings, Director director) {
 		super(NAME, specif, settings, director);
-		
+
 		List<String> newIvc = new ArrayList<>(spec.node.ivc);
 		if(settings.allAssigned){
 			newIvc = new ArrayList<>();
 			newIvc.addAll(Util.getIds(spec.node.locals));
 			newIvc.addAll(Util.getIds(spec.node.outputs));
 		}
-		
+
 		ivcMap = Lustre2Sexp.createIvcMap(newIvc);
 	}
 
@@ -197,9 +198,9 @@ public class IvcReductionEngine extends SolverBasedEngine {
 
 	/**
 	 * Base step query for IVC reduction. Examples for k = 1, 2, 3:
-	 * 
+	 *
 	 * %init => P(0)
-	 * 
+	 *
 	 * %init => (P(0) and (T(0, 1) => P(1)))
 	 *
 	 * %init => (P(0) and (T(0, 1) => (P(1) and (T(1, 2) => P(2)))))
@@ -215,9 +216,9 @@ public class IvcReductionEngine extends SolverBasedEngine {
 
 	/**
 	 * Inductive step query for IVC reduction. Examples for k = 1, 2, 3:
-	 * 
+	 *
 	 * (P(0) and T(0, 1)) => P(1)
-	 * 
+	 *
 	 * (P(0) and T(0, 1) and P(1) and T(1, 2)) => P(2)
 	 *
 	 * (P(0) and T(0, 1) and P(1) and T(1, 2) and P(2) and T(2, 3)) => P(3)
@@ -304,5 +305,9 @@ public class IvcReductionEngine extends SolverBasedEngine {
 
 	@Override
 	protected void handleMessage(MutationMessage vm) {
+	}
+
+	@Override
+	protected void handleMessage(NodeInputMutationMessage vm) {
 	}
 }

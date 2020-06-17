@@ -9,7 +9,7 @@ import jkind.translation.Specification;
 
 public class GraphInvariantGenerationEngine extends AbstractInvariantGenerationEngine {
 	public static final String NAME = "invariant-generation";
-	
+
 	public GraphInvariantGenerationEngine(Specification spec, JKindSettings settings,
 			Director director) {
 		super(NAME, spec, settings, director);
