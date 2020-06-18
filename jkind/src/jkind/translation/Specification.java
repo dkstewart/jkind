@@ -11,7 +11,6 @@ import jkind.lustre.Program;
 import jkind.lustre.Type;
 import jkind.sexp.Symbol;
 import jkind.slicing.DependencyMap;
-import jkind.slicing.LustreSlicer;
 import jkind.util.Util;
 
 public class Specification {
@@ -22,7 +21,7 @@ public class Specification {
 	private Relation transitionRelation;
 	private Relation ivcTransitionRelation;
 	public final List<Constant> constants; // Storing the constants with their original types
-	
+
 	public Specification(Program program, boolean slicing) {
 		Node main = program.getMainNode();
 		if (slicing) {
@@ -30,7 +29,7 @@ public class Specification {
 		} else {
 			this.dependencyMap = DependencyMap.full(main, program.functions);
 		}
-		this.node = LustreSlicer.slice(main, dependencyMap);
+		this.node = main;// LustreSlicer.slice(main, dependencyMap);
 		this.functions = Util.safeList(program.functions);
 		this.typeMap = Util.getTypeMap(node);
 		this.constants = program.constants; // Getting the constants
@@ -53,9 +52,9 @@ public class Specification {
 		}
 		return ivcTransitionRelation;
 	}
-	
+
 	public Relation getMutationTransitionRelation(String str, Map<Ast, Symbol> mutationMap) {
 		return Lustre2Sexp.constructMutationTransitionRelation(str, node, mutationMap);
 	}
-	
+
 }
