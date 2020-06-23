@@ -22,6 +22,7 @@ import jkind.advice.AdviceWriter;
 import jkind.engines.invariant.GraphInvariantGenerationEngine;
 import jkind.engines.messages.BaseStepMessage;
 import jkind.engines.messages.EngineType;
+import jkind.engines.messages.GuaranteeMutationMessage;
 import jkind.engines.messages.InductiveCounterexampleMessage;
 import jkind.engines.messages.InvalidMessage;
 import jkind.engines.messages.InvariantMessage;
@@ -380,6 +381,11 @@ public class Director extends MessageHandler {
 	@Override
 	protected void handleMessage(NodeInputMutationMessage mutm) {
 		writer.writeNodeInputMutation(mutm.node_input_mutations);
+	}
+
+	@Override
+	protected void handleMessage(GuaranteeMutationMessage mutm) {
+		writer.writeGuaranteeMutation(mutm.guarantee_mutations);
 	}
 
 	private final Map<String, Integer> bmcUnknowns = new HashMap<>();

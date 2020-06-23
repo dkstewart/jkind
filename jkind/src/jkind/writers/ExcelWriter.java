@@ -91,4 +91,8 @@ public class ExcelWriter extends Writer {
 	@Override
 	public void writeNodeInputMutation(HashMap<Expr, Mutation> node_input_mutations) {
 	}
+
+	@Override
+	public void writeGuaranteeMutation(HashMap<Expr, Mutation> guarantee_mutations) {
+	}
 }

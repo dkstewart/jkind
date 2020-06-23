@@ -154,4 +154,17 @@ public class ConsoleWriter extends Writer {
 		}
 		writeLine();
 	}
+
+	@Override
+	public void writeGuaranteeMutation(HashMap<Expr, Mutation> guarantee_mutations) {
+		writeLine();
+
+//		for (Expr ex : node_input_mutations.keySet()) {
+//			if (node_input_mutations.get(ex).verdict == Verdict.KILLED) {
+//				System.out.println("KILLED: Node input: " + ex.toString() + " at location: "
+//						+ node_input_mutations.get(ex).location);
+//			}
+//		}
+//		writeLine();
+	}
 }

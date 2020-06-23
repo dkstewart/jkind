@@ -33,4 +33,6 @@ public abstract class Writer {
 	public abstract void writeMutation(Map<Location, List<Mutation>> location_mutations, double runTime, JKindSettings settings);
 
 	public abstract void writeNodeInputMutation(HashMap<Expr, Mutation> node_input_mutations);
+
+	public abstract void writeGuaranteeMutation(HashMap<Expr, Mutation> guarantee_mutations);
 }

@@ -16,6 +16,7 @@ import jkind.engines.Director;
 import jkind.engines.Engine;
 import jkind.engines.messages.BaseStepMessage;
 import jkind.engines.messages.EngineType;
+import jkind.engines.messages.GuaranteeMutationMessage;
 import jkind.engines.messages.InductiveCounterexampleMessage;
 import jkind.engines.messages.InvalidMessage;
 import jkind.engines.messages.InvariantMessage;
@@ -32,6 +33,7 @@ import jkind.lustre.builders.ProgramBuilder;
 import jkind.sexp.Symbol;
 import jkind.translation.InlineSimpleEquations;
 import jkind.translation.Specification;
+import jkind.util.GuaranteeMutationExtractor;
 import jkind.util.NodeInputMutationExtractor;
 
 public class MutationEngine extends Engine {
@@ -208,6 +210,9 @@ public class MutationEngine extends Engine {
 		// Create NodeInputMutationExtractor object and get node inputs
 		NodeInputMutationExtractor nodeExtr = new NodeInputMutationExtractor(program, location_mutations);
 		nodeExtr.setNodeInputMutationMap();
+		// Create GuaranteeMutationExtractor object and get guarantees
+		GuaranteeMutationExtractor guarExtr = new GuaranteeMutationExtractor(program, location_mutations);
+		guarExtr.setGuaranteeMutationMap();
 
 		for (ValidMessage vm : validMessages) {
 			Itinerary itinerary = vm.getNextItinerary();
@@ -215,6 +220,7 @@ public class MutationEngine extends Engine {
 		}
 		director.broadcast(new MutationMessage(location_mutations, startTime));
 		director.broadcast(new NodeInputMutationMessage(nodeExtr.getNodeInputMutationMap()));
+		director.broadcast(new GuaranteeMutationMessage(guarExtr.getGuaranteeMutationMap()));
 	}
 
 	@Override
@@ -302,6 +308,10 @@ public class MutationEngine extends Engine {
 
 	@Override
 	protected void handleMessage(NodeInputMutationMessage vm) {
+	}
+
+	@Override
+	protected void handleMessage(GuaranteeMutationMessage vm) {
 	}
 
 }

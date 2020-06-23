@@ -65,4 +65,6 @@ public abstract class MessageHandler {
 
 	protected abstract void handleMessage(NodeInputMutationMessage vm);
 
+	protected abstract void handleMessage(GuaranteeMutationMessage vm);
+
 }

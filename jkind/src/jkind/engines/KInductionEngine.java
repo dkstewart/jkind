@@ -10,6 +10,7 @@ import java.util.Map;
 import jkind.JKindSettings;
 import jkind.engines.invariant.InvariantSet;
 import jkind.engines.messages.BaseStepMessage;
+import jkind.engines.messages.GuaranteeMutationMessage;
 import jkind.engines.messages.InductiveCounterexampleMessage;
 import jkind.engines.messages.InvalidMessage;
 import jkind.engines.messages.InvariantMessage;
@@ -198,5 +199,9 @@ public class KInductionEngine extends SolverBasedEngine {
 
 	@Override
 	protected void handleMessage(NodeInputMutationMessage vm) {
+	}
+
+	@Override
+	protected void handleMessage(GuaranteeMutationMessage vm) {
 	}
 }

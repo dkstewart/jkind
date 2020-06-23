@@ -1,0 +1,629 @@
+type Base_Types__Boolean = bool;
+type Base_Types__Unsigned = int;
+type Base_Types__Unsigned_64 = int;
+type Base_Types__Unsigned_32 = int;
+type Base_Types__Unsigned_16 = int;
+type Base_Types__Unsigned_8 = int;
+type Base_Types__Integer = int;
+type Base_Types__Integer_64 = int;
+type Base_Types__Integer_32 = int;
+type Base_Types__Integer_16 = int;
+type Base_Types__Integer_8 = int;
+type Base_Types__Float = real;
+type Base_Types__Float_32 = real;
+type Base_Types__Float_64 = real;
+
+node _TOP__sensors(
+  __ASSUME__HIST : bool;
+  __ASSUME0 : bool;
+  __ASSUME1 : bool;
+  AoA : int;
+  Flaps : int;
+  time : real;
+  fault__trigger__sensors__fault_1 : bool;
+  sensors__fault_1__fail_to : int;
+  fault__trigger__sensors__fault_2 : bool;
+  sensors__fault_2__fail_to : int;
+  __fault__nominal__AoA_Out : int;
+  AoA_Out : int;
+  Flaps_Out : int
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+  sensors__fault_1__node__val_out : int;
+  sensors__fault_2__node__val_out : int;
+let
+  __GUARANTEE0 = ((AoA = __fault__nominal__AoA_Out) and (Flaps = Flaps_Out));
+
+  __ASSERT = ((AoA_Out = (if fault__trigger__sensors__fault_1 then sensors__fault_1__node__val_out else (if fault__trigger__sensors__fault_2 then sensors__fault_2__node__val_out else __fault__nominal__AoA_Out))) and ((sensors__fault_2__fail_to = 1) and ((sensors__fault_1__fail_to = 2) and ((__ASSUME__HIST => __GUARANTEE0) and ((__ASSUME1 = (AoA = 0)) and (__ASSUME0 = (0 = Flaps)))))));
+
+  sensors__fault_1__node__val_out = Basic_Faults__fail_to_int(__fault__nominal__AoA_Out, sensors__fault_1__fail_to, fault__trigger__sensors__fault_1);
+
+  sensors__fault_2__node__val_out = Basic_Faults__fail_to_int(__fault__nominal__AoA_Out, sensors__fault_2__fail_to, fault__trigger__sensors__fault_2);
+
+tel;
+
+node _TOP__pilot(
+  __ASSUME__HIST : bool;
+  TrimPos : int;
+  time : real;
+  UNEXPECTED_DOWN_TRIM : bool;
+  YokeArmSw : bool;
+  YokeUpSw : bool;
+  YokeDownSw : bool;
+  YokeTravAft : bool;
+  YokeTravFwd : bool;
+  OverrideSw : bool;
+  CutoutPriSw : bool;
+  CutoutBUSw : bool;
+  TrimWheel : bool
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+  __GUARANTEE1 : bool;
+let
+  __GUARANTEE0 = (OverrideSw = false);
+
+  __GUARANTEE1 = (((((((((not OverrideSw) and (not YokeTravAft)) and (not YokeTravFwd)) and (not YokeArmSw)) and (not YokeUpSw)) and (not YokeDownSw)) and (not TrimWheel)) and CutoutBUSw) and CutoutPriSw);
+
+  __ASSERT = ((UNEXPECTED_DOWN_TRIM = ((not YokeArmSw) and ((0 -> (pre TrimPos)) > TrimPos))) and (__ASSUME__HIST => (__GUARANTEE1 and __GUARANTEE0)));
+
+tel;
+
+node _TOP__fcc(
+  __ASSUME__HIST : bool;
+  __ASSUME0 : bool;
+  __ASSUME1 : bool;
+  AoA : int;
+  Flaps : int;
+  APTrimArm : bool;
+  time : real;
+  AOA_HIGH : bool;
+  CCS_OFF : int;
+  CCS_READY : int;
+  CCS_ON : int;
+  TRANS_ON : bool;
+  TRANS_OFF : bool;
+  TRANS_READY : bool;
+  TIMER : int;
+  CCS : int;
+  APFlapsDn : bool;
+  APDown : bool;
+  APUp : bool;
+  MCASeng : bool;
+  APArm : bool
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+  __GUARANTEE1 : bool;
+  __GUARANTEE2 : bool;
+  __GUARANTEE3 : bool;
+  __GUARANTEE4 : bool;
+let
+  __GUARANTEE0 = ((CCS = CCS_ON) = ((MCASeng and APArm) and APDown));
+
+  __GUARANTEE1 = (((CCS = CCS_OFF) or (CCS = CCS_READY)) = (((not MCASeng) and (not APArm)) and (not APDown)));
+
+  __GUARANTEE2 = (APFlapsDn = false);
+
+  __GUARANTEE3 = (((false -> (pre APArm)) and (not APTrimArm)) => ((not APArm) and (not MCASeng)));
+
+  __GUARANTEE4 = (APUp = false);
+
+  __ASSERT = ((CCS = (CCS_READY -> (if (((pre CCS) = CCS_READY) and AOA_HIGH) then CCS_ON else (if (((pre CCS) = CCS_ON) and (((TIMER = 10) or (not APTrimArm)) or (not AOA_HIGH))) then CCS_OFF else (if (((pre CCS) = CCS_OFF) and (TIMER = 5)) then CCS_READY else (pre CCS)))))) and ((TIMER = (0 -> (if ((TRANS_ON or TRANS_OFF) or TRANS_READY) then 0 else ((pre TIMER) + 1)))) and ((TRANS_READY = (false -> ((not ((pre CCS) = CCS_READY)) and (CCS = CCS_READY)))) and ((TRANS_OFF = (false -> ((not ((pre CCS) = CCS_OFF)) and (CCS = CCS_OFF)))) and ((TRANS_ON = (false -> ((not ((pre CCS) = CCS_ON)) and (CCS = CCS_ON)))) and ((CCS_ON = 2) and ((CCS_READY = 1) and ((CCS_OFF = 0) and ((AOA_HIGH = (AoA > 0)) and ((__ASSUME__HIST => (__GUARANTEE4 and (__GUARANTEE3 and (__GUARANTEE2 and (__GUARANTEE1 and __GUARANTEE0))))) and ((__ASSUME1 = (AoA = 0)) and (__ASSUME0 = (0 = Flaps)))))))))))));
+
+tel;
+
+node _TOP__colSwitchMod(
+  __ASSUME__HIST : bool;
+  YokeArmSw : bool;
+  YokeUpSw : bool;
+  YokeDownSw : bool;
+  YokeTravAft : bool;
+  YokeTravFwd : bool;
+  OverrideSw : bool;
+  APFlapsDn : bool;
+  APDown : bool;
+  APUp : bool;
+  MCASeng : bool;
+  APTrimEn : bool;
+  TrimEn : bool;
+  time : real;
+  YokeArm : bool;
+  YokeUp : bool;
+  YokeDown : bool;
+  ManTrimArm : bool;
+  ManTrimUp : bool;
+  ManTrimDown : bool;
+  ManTrimRate : bool;
+  APTrimArm : bool;
+  APTrimUp : bool;
+  APTrimDown : bool;
+  APTrimRate : bool
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+  __GUARANTEE1 : bool;
+  __GUARANTEE2 : bool;
+  __GUARANTEE3 : bool;
+  __GUARANTEE4 : bool;
+  __GUARANTEE5 : bool;
+  __GUARANTEE6 : bool;
+  __GUARANTEE7 : bool;
+let
+  __GUARANTEE0 = ((ManTrimUp = YokeUp) and (not (YokeTravFwd or OverrideSw)));
+
+  __GUARANTEE1 = ((ManTrimDown = YokeDown) and (not (YokeTravAft or OverrideSw)));
+
+  __GUARANTEE2 = (ManTrimRate = false);
+
+  __GUARANTEE3 = (ManTrimArm = YokeArm);
+
+  __GUARANTEE4 = (APTrimArm = ((not YokeArm) and APTrimEn));
+
+  __GUARANTEE5 = (APTrimUp = (APUp and (not YokeTravFwd)));
+
+  __GUARANTEE6 = (APTrimDown = (APDown and ((not YokeTravAft) or MCASeng)));
+
+  __GUARANTEE7 = (APTrimRate = (APFlapsDn or MCASeng));
+
+  __ASSERT = ((YokeDown = (TrimEn and YokeDownSw)) and ((YokeUp = (TrimEn and YokeUpSw)) and ((YokeArm = (TrimEn and YokeArmSw)) and (__ASSUME__HIST => (__GUARANTEE7 and (__GUARANTEE6 and (__GUARANTEE5 and (__GUARANTEE4 and (__GUARANTEE3 and (__GUARANTEE2 and (__GUARANTEE1 and __GUARANTEE0)))))))))));
+
+tel;
+
+node _TOP__cutoutSwitch(
+  __ASSUME__HIST : bool;
+  CutoutPriSw : bool;
+  CutoutBUSw : bool;
+  APArm : bool;
+  time : real;
+  APTrimEn : bool;
+  TrimEn : bool
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+  __GUARANTEE1 : bool;
+let
+  __GUARANTEE0 = (TrimEn = (CutoutPriSw and CutoutBUSw));
+
+  __GUARANTEE1 = (APTrimEn = (CutoutPriSw and APArm));
+
+  __ASSERT = (__ASSUME__HIST => (__GUARANTEE1 and __GUARANTEE0));
+
+tel;
+
+node _TOP__actuator(
+  __ASSUME__HIST : bool;
+  ManTrimArm : bool;
+  ManTrimUp : bool;
+  ManTrimDown : bool;
+  ManTrimRate : bool;
+  APTrimArm : bool;
+  APTrimUp : bool;
+  APTrimDown : bool;
+  APTrimRate : bool;
+  TrimWheel : bool;
+  time : real;
+  ManRate : int;
+  APRate : int;
+  TrimPos : int
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+let
+  __GUARANTEE0 = (if TrimWheel then (TrimPos = (0 -> (pre TrimPos))) else (if ManTrimArm then (if ManTrimUp then (TrimPos = ((0 -> (pre TrimPos)) + ManRate)) else (if ManTrimDown then (TrimPos = ((0 -> (pre TrimPos)) - ManRate)) else (TrimPos = (0 -> (pre TrimPos))))) else (if APTrimArm then (if APTrimUp then (TrimPos = ((0 -> (pre TrimPos)) + APRate)) else (if APTrimDown then (TrimPos = ((0 -> (pre TrimPos)) - APRate)) else (TrimPos = (0 -> (pre TrimPos))))) else (TrimPos = (0 -> (pre TrimPos))))));
+
+  __ASSERT = ((APRate = (if (APTrimRate = false) then 1 else 3)) and ((ManRate = (if (ManTrimRate = false) then 1 else 3)) and (__ASSUME__HIST => __GUARANTEE0)));
+
+tel;
+
+node main(
+  sensors__AoA_Out : int;
+  sensors__Flaps_Out : int;
+  sensors____ASSUME0 : bool;
+  sensors____ASSUME1 : bool;
+  sensors____ASSUME__HIST : bool;
+  pilot__UNEXPECTED_DOWN_TRIM : bool;
+  pilot__YokeArmSw : bool;
+  pilot__YokeUpSw : bool;
+  pilot__YokeDownSw : bool;
+  pilot__YokeTravAft : bool;
+  pilot__YokeTravFwd : bool;
+  pilot__OverrideSw : bool;
+  pilot__CutoutPriSw : bool;
+  pilot__CutoutBUSw : bool;
+  pilot__TrimWheel : bool;
+  pilot____ASSUME__HIST : bool;
+  fcc__AOA_HIGH : bool;
+  fcc__CCS_OFF : int;
+  fcc__CCS_READY : int;
+  fcc__CCS_ON : int;
+  fcc__TRANS_ON : bool;
+  fcc__TRANS_OFF : bool;
+  fcc__TRANS_READY : bool;
+  fcc__TIMER : int;
+  fcc__CCS : int;
+  fcc__APFlapsDn : bool;
+  fcc__APDown : bool;
+  fcc__APUp : bool;
+  fcc__MCASeng : bool;
+  fcc__APArm : bool;
+  fcc____ASSUME0 : bool;
+  fcc____ASSUME1 : bool;
+  fcc____ASSUME__HIST : bool;
+  colSwitchMod__YokeArm : bool;
+  colSwitchMod__YokeUp : bool;
+  colSwitchMod__YokeDown : bool;
+  colSwitchMod__ManTrimArm : bool;
+  colSwitchMod__ManTrimUp : bool;
+  colSwitchMod__ManTrimDown : bool;
+  colSwitchMod__ManTrimRate : bool;
+  colSwitchMod__APTrimArm : bool;
+  colSwitchMod__APTrimUp : bool;
+  colSwitchMod__APTrimDown : bool;
+  colSwitchMod__APTrimRate : bool;
+  colSwitchMod____ASSUME__HIST : bool;
+  cutoutSwitch__APTrimEn : bool;
+  cutoutSwitch__TrimEn : bool;
+  cutoutSwitch____ASSUME__HIST : bool;
+  actuator__ManRate : int;
+  actuator__APRate : int;
+  actuator__TrimPos : int;
+  actuator____ASSUME__HIST : bool;
+  AoASensor_failed_reasonable : bool;
+  AoASensor_failed_unreasonable : bool;
+  TrimPos : int;
+  sensors__AoA : int;
+  sensors__Flaps : int;
+  sensors__time : real;
+  sensors__fault__trigger__sensors__fault_1 : bool;
+  sensors__sensors__fault_1__fail_to : int;
+  sensors__fault__trigger__sensors__fault_2 : bool;
+  sensors__sensors__fault_2__fail_to : int;
+  sensors____fault__nominal__AoA_Out : int;
+  pilot__TrimPos : int;
+  pilot__time : real;
+  fcc__AoA : int;
+  fcc__Flaps : int;
+  fcc__APTrimArm : bool;
+  fcc__time : real;
+  colSwitchMod__YokeArmSw : bool;
+  colSwitchMod__YokeUpSw : bool;
+  colSwitchMod__YokeDownSw : bool;
+  colSwitchMod__YokeTravAft : bool;
+  colSwitchMod__YokeTravFwd : bool;
+  colSwitchMod__OverrideSw : bool;
+  colSwitchMod__APFlapsDn : bool;
+  colSwitchMod__APDown : bool;
+  colSwitchMod__APUp : bool;
+  colSwitchMod__MCASeng : bool;
+  colSwitchMod__APTrimEn : bool;
+  colSwitchMod__TrimEn : bool;
+  colSwitchMod__time : real;
+  cutoutSwitch__CutoutPriSw : bool;
+  cutoutSwitch__CutoutBUSw : bool;
+  cutoutSwitch__APArm : bool;
+  cutoutSwitch__time : real;
+  actuator__ManTrimArm : bool;
+  actuator__ManTrimUp : bool;
+  actuator__ManTrimDown : bool;
+  actuator__ManTrimRate : bool;
+  actuator__APTrimArm : bool;
+  actuator__APTrimUp : bool;
+  actuator__APTrimDown : bool;
+  actuator__APTrimRate : bool;
+  actuator__TrimWheel : bool;
+  actuator__time : real;
+  AoA : int;
+  Flaps : int;
+  time : real;
+  __fault__event__sensors__sensors__fault_1 : bool;
+  __fault__dependently__active__sensors__sensors__fault_1 : bool;
+  __fault__event__sensors__sensors__fault_2 : bool;
+  __fault__dependently__active__sensors__sensors__fault_2 : bool
+) returns (
+
+);
+var
+  __ASSUME0 : bool;
+  __ASSUME1 : bool;
+  __ASSUME__HIST : bool;
+  __GUARANTEE0 : bool;
+  __GUARANTEE1 : bool;
+  __GUARANTEE2 : bool;
+  __GUARANTEE3 : bool;
+  __GUARANTEE4 : bool;
+  __GUARANTEE5 : bool;
+  __GUARANTEE6 : bool;
+  __GUARANTEE7 : bool;
+  __GUARANTEE8 : bool;
+  __GUARANTEE9 : bool;
+  __GUARANTEE10 : bool;
+  __GUARANTEE11 : bool;
+  __GUARANTEE12 : bool;
+  __GUARANTEE13 : bool;
+  __GUARANTEE14 : bool;
+  __GUARANTEE15 : bool;
+  __GUARANTEE16 : bool;
+  __GUARANTEE17 : bool;
+  __GUARANTEE18 : bool;
+  __GUARANTEE19 : bool;
+  __GUARANTEE20 : bool;
+  __GUARANTEE21 : bool;
+  __fault__independently__active__sensors__sensors__fault_1 : bool;
+  __fault__independently__active__sensors__sensors__fault_2 : bool;
+let
+  --%MAIN;
+  __ASSUME0 = (0 = Flaps);
+
+  __ASSUME1 = (AoA = 0);
+
+  __ASSUME__HIST = (actuator____ASSUME__HIST and (cutoutSwitch____ASSUME__HIST and (colSwitchMod____ASSUME__HIST and (fcc____ASSUME__HIST and (pilot____ASSUME__HIST and (sensors____ASSUME__HIST and true))))));
+
+  __GUARANTEE0 = ((((sensors__AoA_Out = AoA) and (sensors__Flaps_Out = Flaps)) and (AoA = fcc__AoA)) and (Flaps = fcc__Flaps));
+
+  __GUARANTEE1 = ((fcc__APUp = false) and (colSwitchMod__APTrimUp = false));
+
+  __GUARANTEE2 = ((fcc__MCASeng or (Flaps = 1)) = colSwitchMod__APTrimRate);
+
+  __GUARANTEE3 = (cutoutSwitch__TrimEn = (pilot__CutoutPriSw and pilot__CutoutBUSw));
+
+  __GUARANTEE4 = (cutoutSwitch__APTrimEn = (pilot__CutoutPriSw and fcc__APArm));
+
+  __GUARANTEE5 = (pilot__TrimWheel => ((0 -> (pre TrimPos)) = TrimPos));
+
+  __GUARANTEE6 = ((pilot__CutoutPriSw and pilot__CutoutBUSw) => colSwitchMod__TrimEn);
+
+  __GUARANTEE7 = (true -> (not (((pre fcc__CCS) = fcc__CCS_ON) and (fcc__CCS = fcc__CCS_READY))));
+
+  __GUARANTEE8 = (true -> (not (((pre fcc__CCS) = fcc__CCS_OFF) and (fcc__CCS = fcc__CCS_ON))));
+
+  __GUARANTEE9 = (true -> (not (((pre fcc__CCS) = fcc__CCS_READY) and (fcc__CCS = fcc__CCS_OFF))));
+
+  __GUARANTEE10 = (((fcc__CCS = fcc__CCS_READY) or (fcc__CCS = fcc__CCS_OFF)) = (not fcc__MCASeng));
+
+  __GUARANTEE11 = ((fcc__CCS = fcc__CCS_ON) = fcc__MCASeng);
+
+  __GUARANTEE12 = (((fcc__CCS = fcc__CCS_ON) and ((pre fcc__CCS) = fcc__CCS_ON)) => ((pre fcc__TIMER) < fcc__TIMER));
+
+  __GUARANTEE13 = (((fcc__CCS = fcc__CCS_OFF) and ((pre fcc__CCS) = fcc__CCS_OFF)) => ((pre fcc__TIMER) < fcc__TIMER));
+
+  __GUARANTEE14 = (true -> ((((pre fcc__CCS) = fcc__CCS_ON) and (((pre fcc__TIMER) = 10) or (not (pre fcc__APTrimArm)))) = (fcc__CCS = fcc__CCS_OFF)));
+
+  __GUARANTEE15 = (true -> (((fcc__CCS = fcc__CCS_OFF) or (fcc__CCS = fcc__CCS_READY)) => (((not fcc__MCASeng) and (not fcc__APArm)) and (not fcc__APDown))));
+
+  __GUARANTEE16 = (true -> ((fcc__CCS = fcc__CCS_ON) = fcc__MCASeng));
+
+  __GUARANTEE17 = (pilot__TrimWheel => (TrimPos = (0 -> (pre TrimPos))));
+
+  __GUARANTEE18 = (true -> ((pilot__YokeArmSw and pilot__YokeUpSw) => (TrimPos > (0 -> (pre TrimPos)))));
+
+  __GUARANTEE19 = ((((not pilot__YokeArmSw) and (false -> (pre fcc__APDown))) and fcc__APDown) => (TrimPos < (0 -> (pre TrimPos))));
+
+  __GUARANTEE20 = (true -> ((AoASensor_failed_reasonable or AoASensor_failed_unreasonable) = pilot__UNEXPECTED_DOWN_TRIM));
+
+  __GUARANTEE21 = (((-30) < TrimPos) and (TrimPos < 30));
+
+  __fault__independently__active__sensors__sensors__fault_1 = false;
+
+  __fault__independently__active__sensors__sensors__fault_2 = false;
+
+  assert __ASSUME0;
+
+  assert __ASSUME1;
+
+  assert (time = sensors__time);
+
+  assert _TOP__sensors(sensors____ASSUME__HIST, sensors____ASSUME0, sensors____ASSUME1, sensors__AoA, sensors__Flaps, sensors__time, sensors__fault__trigger__sensors__fault_1, sensors__sensors__fault_1__fail_to, sensors__fault__trigger__sensors__fault_2, sensors__sensors__fault_2__fail_to, sensors____fault__nominal__AoA_Out, sensors__AoA_Out, sensors__Flaps_Out);
+
+  assert (sensors____ASSUME__HIST = __HIST((sensors____ASSUME1 and sensors____ASSUME0)));
+
+  assert (time = pilot__time);
+
+  assert _TOP__pilot(pilot____ASSUME__HIST, pilot__TrimPos, pilot__time, pilot__UNEXPECTED_DOWN_TRIM, pilot__YokeArmSw, pilot__YokeUpSw, pilot__YokeDownSw, pilot__YokeTravAft, pilot__YokeTravFwd, pilot__OverrideSw, pilot__CutoutPriSw, pilot__CutoutBUSw, pilot__TrimWheel);
+
+  assert (pilot____ASSUME__HIST = __HIST(true));
+
+  assert (time = fcc__time);
+
+  assert _TOP__fcc(fcc____ASSUME__HIST, fcc____ASSUME0, fcc____ASSUME1, fcc__AoA, fcc__Flaps, fcc__APTrimArm, fcc__time, fcc__AOA_HIGH, fcc__CCS_OFF, fcc__CCS_READY, fcc__CCS_ON, fcc__TRANS_ON, fcc__TRANS_OFF, fcc__TRANS_READY, fcc__TIMER, fcc__CCS, fcc__APFlapsDn, fcc__APDown, fcc__APUp, fcc__MCASeng, fcc__APArm);
+
+  assert (fcc____ASSUME__HIST = __HIST((fcc____ASSUME1 and fcc____ASSUME0)));
+
+  assert (time = colSwitchMod__time);
+
+  assert _TOP__colSwitchMod(colSwitchMod____ASSUME__HIST, colSwitchMod__YokeArmSw, colSwitchMod__YokeUpSw, colSwitchMod__YokeDownSw, colSwitchMod__YokeTravAft, colSwitchMod__YokeTravFwd, colSwitchMod__OverrideSw, colSwitchMod__APFlapsDn, colSwitchMod__APDown, colSwitchMod__APUp, colSwitchMod__MCASeng, colSwitchMod__APTrimEn, colSwitchMod__TrimEn, colSwitchMod__time, colSwitchMod__YokeArm, colSwitchMod__YokeUp, colSwitchMod__YokeDown, colSwitchMod__ManTrimArm, colSwitchMod__ManTrimUp, colSwitchMod__ManTrimDown, colSwitchMod__ManTrimRate, colSwitchMod__APTrimArm, colSwitchMod__APTrimUp, colSwitchMod__APTrimDown, colSwitchMod__APTrimRate);
+
+  assert (colSwitchMod____ASSUME__HIST = __HIST(true));
+
+  assert (time = cutoutSwitch__time);
+
+  assert _TOP__cutoutSwitch(cutoutSwitch____ASSUME__HIST, cutoutSwitch__CutoutPriSw, cutoutSwitch__CutoutBUSw, cutoutSwitch__APArm, cutoutSwitch__time, cutoutSwitch__APTrimEn, cutoutSwitch__TrimEn);
+
+  assert (cutoutSwitch____ASSUME__HIST = __HIST(true));
+
+  assert (time = actuator__time);
+
+  assert _TOP__actuator(actuator____ASSUME__HIST, actuator__ManTrimArm, actuator__ManTrimUp, actuator__ManTrimDown, actuator__ManTrimRate, actuator__APTrimArm, actuator__APTrimUp, actuator__APTrimDown, actuator__APTrimRate, actuator__TrimWheel, actuator__time, actuator__ManRate, actuator__APRate, actuator__TrimPos);
+
+  assert (actuator____ASSUME__HIST = __HIST(true));
+
+  assert (AoA = sensors__AoA);
+
+  assert (Flaps = sensors__Flaps);
+
+  assert (pilot__YokeArmSw = colSwitchMod__YokeArmSw);
+
+  assert (pilot__YokeUpSw = colSwitchMod__YokeUpSw);
+
+  assert (pilot__YokeDownSw = colSwitchMod__YokeDownSw);
+
+  assert (pilot__YokeTravAft = colSwitchMod__YokeTravAft);
+
+  assert (pilot__YokeTravFwd = colSwitchMod__YokeTravFwd);
+
+  assert (pilot__OverrideSw = colSwitchMod__OverrideSw);
+
+  assert (pilot__CutoutPriSw = cutoutSwitch__CutoutPriSw);
+
+  assert (pilot__CutoutBUSw = cutoutSwitch__CutoutBUSw);
+
+  assert (sensors__AoA_Out = fcc__AoA);
+
+  assert (sensors__Flaps_Out = fcc__Flaps);
+
+  assert (fcc__APFlapsDn = colSwitchMod__APFlapsDn);
+
+  assert (fcc__APDown = colSwitchMod__APDown);
+
+  assert (fcc__APUp = colSwitchMod__APUp);
+
+  assert (fcc__MCASeng = colSwitchMod__MCASeng);
+
+  assert (fcc__APArm = cutoutSwitch__APArm);
+
+  assert (cutoutSwitch__APTrimEn = colSwitchMod__APTrimEn);
+
+  assert (cutoutSwitch__TrimEn = colSwitchMod__TrimEn);
+
+  assert (colSwitchMod__ManTrimArm = actuator__ManTrimArm);
+
+  assert (colSwitchMod__ManTrimUp = actuator__ManTrimUp);
+
+  assert (colSwitchMod__ManTrimDown = actuator__ManTrimDown);
+
+  assert (colSwitchMod__ManTrimRate = actuator__ManTrimRate);
+
+  assert (colSwitchMod__APTrimArm = actuator__APTrimArm);
+
+  assert (colSwitchMod__APTrimUp = actuator__APTrimUp);
+
+  assert (colSwitchMod__APTrimDown = actuator__APTrimDown);
+
+  assert (colSwitchMod__APTrimRate = actuator__APTrimRate);
+
+  assert (pilot__TrimWheel = actuator__TrimWheel);
+
+  assert (actuator__TrimPos = pilot__TrimPos);
+
+  assert (actuator__TrimPos = TrimPos);
+
+  assert (colSwitchMod__APTrimArm = fcc__APTrimArm);
+
+  assert (AoASensor_failed_reasonable = ((AoA = 0) and (fcc__AoA = 1)));
+
+  assert (AoASensor_failed_unreasonable = ((AoA = 0) and (fcc__AoA = 2)));
+
+  assert (__fault__independently__active__sensors__sensors__fault_1 = (__fault__event__sensors__sensors__fault_1 -> (__fault__event__sensors__sensors__fault_1 or (pre __fault__independently__active__sensors__sensors__fault_1))));
+
+  assert (__fault__dependently__active__sensors__sensors__fault_1 = (false -> (false or (pre __fault__dependently__active__sensors__sensors__fault_1))));
+
+  assert (sensors__fault__trigger__sensors__fault_1 = (__fault__independently__active__sensors__sensors__fault_1 or __fault__dependently__active__sensors__sensors__fault_1));
+
+  assert (__fault__independently__active__sensors__sensors__fault_2 = (__fault__event__sensors__sensors__fault_2 -> (__fault__event__sensors__sensors__fault_2 or (pre __fault__independently__active__sensors__sensors__fault_2))));
+
+  assert (__fault__dependently__active__sensors__sensors__fault_2 = (false -> (false or (pre __fault__dependently__active__sensors__sensors__fault_2))));
+
+  assert (sensors__fault__trigger__sensors__fault_2 = (__fault__independently__active__sensors__sensors__fault_2 or __fault__dependently__active__sensors__sensors__fault_2));
+
+  assert true;
+
+  assert (((time = 0.0) -> (time > (pre time))) and (true -> (time = ((pre time) + (time - (pre time))))));
+
+  --%PROPERTY sensors____ASSUME0;
+  --%PROPERTY sensors____ASSUME1;
+  --%PROPERTY fcc____ASSUME0;
+  --%PROPERTY fcc____ASSUME1;
+  --%PROPERTY __ASSUME__HIST;
+  --%PROPERTY __GUARANTEE0;
+  --%PROPERTY __GUARANTEE1;
+  --%PROPERTY __GUARANTEE2;
+  --%PROPERTY __GUARANTEE3;
+  --%PROPERTY __GUARANTEE4;
+  --%PROPERTY __GUARANTEE5;
+  --%PROPERTY __GUARANTEE6;
+  --%PROPERTY __GUARANTEE7;
+  --%PROPERTY __GUARANTEE8;
+  --%PROPERTY __GUARANTEE9;
+  --%PROPERTY __GUARANTEE10;
+  --%PROPERTY __GUARANTEE11;
+  --%PROPERTY __GUARANTEE12;
+  --%PROPERTY __GUARANTEE13;
+  --%PROPERTY __GUARANTEE14;
+  --%PROPERTY __GUARANTEE15;
+  --%PROPERTY __GUARANTEE16;
+  --%PROPERTY __GUARANTEE17;
+  --%PROPERTY __GUARANTEE18;
+  --%PROPERTY __GUARANTEE19;
+  --%PROPERTY __GUARANTEE20;
+  --%PROPERTY __GUARANTEE21;
+
+  --%IVC __fault__independently__active__sensors__sensors__fault_1, __fault__independently__active__sensors__sensors__fault_2;
+
+tel;
+
+node Basic_Faults__fail_to_int(
+  val_in : int;
+  alt_val : int;
+  trigger : bool
+) returns (
+  val_out : int
+);
+let
+  val_out = (if trigger then alt_val else val_in);
+
+tel;
+
+node __HIST(
+  input : bool
+) returns (
+  hist : bool
+);
+let
+  hist = (input -> ((pre hist) and input));
+
+tel;
+
+node __MinPos(
+  a : real;
+  b : real
+) returns (
+  ret : real
+);
+let
+  ret = (if (a <= 0.0) then b else (if (b <= 0.0) then a else (if (a <= b) then a else b)));
+
+tel;
+
+node __Rise(
+  input : bool
+) returns (
+  output : bool
+);
+let
+  output = (input -> ((pre (not input)) and input));
+
+tel;
+
+node __Fall(
+  input : bool
+) returns (
+  output : bool
+);
+let
+  output = ((not input) -> ((pre input) and (not input)));
+
+tel;
+

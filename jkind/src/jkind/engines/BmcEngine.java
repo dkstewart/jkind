@@ -5,6 +5,7 @@ import java.util.List;
 
 import jkind.JKindSettings;
 import jkind.engines.messages.BaseStepMessage;
+import jkind.engines.messages.GuaranteeMutationMessage;
 import jkind.engines.messages.InductiveCounterexampleMessage;
 import jkind.engines.messages.InvalidMessage;
 import jkind.engines.messages.InvariantMessage;
@@ -129,5 +130,9 @@ public class BmcEngine extends SolverBasedEngine {
 
 	@Override
 	protected void handleMessage(NodeInputMutationMessage vm) {
+	}
+
+	@Override
+	protected void handleMessage(GuaranteeMutationMessage vm) {
 	}
 }
