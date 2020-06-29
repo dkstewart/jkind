@@ -10,6 +10,7 @@ import java.util.Set;
 import jkind.JKindSettings;
 import jkind.engines.mutation.Mutation;
 import jkind.engines.mutation.Mutation.Verdict;
+import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.Location;
 import jkind.results.Counterexample;
@@ -156,15 +157,15 @@ public class ConsoleWriter extends Writer {
 	}
 
 	@Override
-	public void writeGuaranteeMutation(HashMap<Expr, Mutation> guarantee_mutations) {
+	public void writeGuaranteeMutation(HashMap<Equation, Mutation> guarantee_mutations) {
 		writeLine();
 
-//		for (Expr ex : node_input_mutations.keySet()) {
-//			if (node_input_mutations.get(ex).verdict == Verdict.KILLED) {
-//				System.out.println("KILLED: Node input: " + ex.toString() + " at location: "
-//						+ node_input_mutations.get(ex).location);
-//			}
-//		}
-//		writeLine();
+		for (Equation eq : guarantee_mutations.keySet()) {
+			if (guarantee_mutations.get(eq).verdict == Verdict.KILLED) {
+				System.out.println("KILLED: Node input: " + eq.toString() + " at location: "
+						+ guarantee_mutations.get(eq).location);
+			}
+		}
+		writeLine();
 	}
 }

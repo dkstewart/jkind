@@ -12,6 +12,7 @@ import java.util.Set;
 import jkind.JKindSettings;
 import jkind.engines.mutation.Mutation;
 import jkind.excel.ExcelFormatter;
+import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.Location;
 import jkind.lustre.Node;
@@ -93,6 +94,6 @@ public class ExcelWriter extends Writer {
 	}
 
 	@Override
-	public void writeGuaranteeMutation(HashMap<Expr, Mutation> guarantee_mutations) {
+	public void writeGuaranteeMutation(HashMap<Equation, Mutation> guarantee_mutations) {
 	}
 }

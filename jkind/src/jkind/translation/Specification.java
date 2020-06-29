@@ -35,6 +35,8 @@ public class Specification {
 		this.constants = program.constants; // Getting the constants
 	}
 
+//	public Specification(Program program, boolean slicing)
+
 	public Specification(Program program) {
 		this(program, false);
 	}

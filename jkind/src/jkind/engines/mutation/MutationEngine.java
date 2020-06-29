@@ -109,7 +109,7 @@ public class MutationEngine extends Engine {
 
 //		// equation remover
 //		mutators.add(new EquationRemover(this, "eq_remove"));
-		mutators.add(new EquationRemover(this, "eq_remove", program));
+//		mutators.add(new EquationRemover(this, "eq_remove", program));
 
 //		// OLD equation init mutator
 //		mutators.add(new InitMutator(this, "init_5_false", 5, false));

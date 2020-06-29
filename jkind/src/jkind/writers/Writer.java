@@ -7,6 +7,7 @@ import java.util.Set;
 
 import jkind.JKindSettings;
 import jkind.engines.mutation.Mutation;
+import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.Location;
 import jkind.results.Counterexample;
@@ -34,5 +35,5 @@ public abstract class Writer {
 
 	public abstract void writeNodeInputMutation(HashMap<Expr, Mutation> node_input_mutations);
 
-	public abstract void writeGuaranteeMutation(HashMap<Expr, Mutation> guarantee_mutations);
+	public abstract void writeGuaranteeMutation(HashMap<Equation, Mutation> guarantee_mutations);
 }

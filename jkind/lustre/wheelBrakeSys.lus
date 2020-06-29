@@ -1,0 +1,248 @@
+type Base_Types__Boolean = bool;
+type Base_Types__Unsigned = int;
+type Base_Types__Unsigned_64 = int;
+type Base_Types__Unsigned_32 = int;
+type Base_Types__Unsigned_16 = int;
+type Base_Types__Unsigned_8 = int;
+type Base_Types__Integer = int;
+type Base_Types__Integer_64 = int;
+type Base_Types__Integer_32 = int;
+type Base_Types__Integer_16 = int;
+type Base_Types__Integer_8 = int;
+type Base_Types__Float = real;
+type Base_Types__Float_32 = real;
+type Base_Types__Float_64 = real;
+
+node _TOP__normal_hyd_fuse(
+  __ASSUME__HIST : bool;
+  hyd_pressure_in : int;
+  time : real;
+  hyd_pressure_out : int
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+let
+  __GUARANTEE0 = (true -> (hyd_pressure_in = hyd_pressure_out));
+
+  __ASSERT = (__ASSUME__HIST => __GUARANTEE0);
+
+  --%IVC __GUARANTEE0;
+
+tel;
+
+node _TOP__normal_hyd_piston(
+  __ASSUME__HIST : bool;
+  hyd_pressure_in : int;
+  time : real;
+  force_out : int
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+let
+  __GUARANTEE0 = (true -> (hyd_pressure_in = force_out));
+
+  __ASSERT = (__ASSUME__HIST => __GUARANTEE0);
+
+  --%IVC __GUARANTEE0;
+
+tel;
+
+node _TOP__alt_hyd_fuse(
+  __ASSUME__HIST : bool;
+  hyd_pressure_in : int;
+  time : real;
+  hyd_pressure_out : int
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+let
+  __GUARANTEE0 = (true -> (hyd_pressure_in = hyd_pressure_out));
+
+  __ASSERT = (__ASSUME__HIST => __GUARANTEE0);
+
+  --%IVC __GUARANTEE0;
+
+tel;
+
+node _TOP__alt_hyd_piston(
+  __ASSUME__HIST : bool;
+  hyd_pressure_in : int;
+  time : real;
+  force_out : int
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+let
+  __GUARANTEE0 = (true -> (hyd_pressure_in = force_out));
+
+  __ASSERT = (__ASSUME__HIST => __GUARANTEE0);
+
+  --%IVC __GUARANTEE0;
+
+tel;
+
+node _TOP__brake_actuator(
+  __ASSUME__HIST : bool;
+  normal_force_in : int;
+  alternate_force_in : int;
+  time : real;
+  fail_value : int;
+  braking_force : int
+) returns (
+  __ASSERT : bool
+);
+var
+  __GUARANTEE0 : bool;
+  __GUARANTEE1 : bool;
+let
+  __GUARANTEE0 = (true -> ((braking_force = alternate_force_in) or (braking_force = normal_force_in)));
+
+  __GUARANTEE1 = (true -> ((braking_force > 0) = ((normal_force_in > 0) or (alternate_force_in > 0))));
+
+  __ASSERT = ((fail_value = (if (normal_force_in > 0) then normal_force_in else alternate_force_in)) and (__ASSUME__HIST => (__GUARANTEE1 and __GUARANTEE0)));
+
+  --%IVC __GUARANTEE0, __GUARANTEE1;
+
+tel;
+
+node main(
+  normal_hyd_fuse__hyd_pressure_out : int;
+  normal_hyd_fuse____ASSUME__HIST : bool;
+  normal_hyd_piston__force_out : int;
+  normal_hyd_piston____ASSUME__HIST : bool;
+  alt_hyd_fuse__hyd_pressure_out : int;
+  alt_hyd_fuse____ASSUME__HIST : bool;
+  alt_hyd_piston__force_out : int;
+  alt_hyd_piston____ASSUME__HIST : bool;
+  brake_actuator__fail_value : int;
+  brake_actuator__braking_force : int;
+  brake_actuator____ASSUME__HIST : bool;
+  brake_force : int;
+  normal_hyd_fuse__hyd_pressure_in : int;
+  normal_hyd_fuse__time : real;
+  normal_hyd_piston__hyd_pressure_in : int;
+  normal_hyd_piston__time : real;
+  alt_hyd_fuse__hyd_pressure_in : int;
+  alt_hyd_fuse__time : real;
+  alt_hyd_piston__hyd_pressure_in : int;
+  alt_hyd_piston__time : real;
+  brake_actuator__normal_force_in : int;
+  brake_actuator__alternate_force_in : int;
+  brake_actuator__time : real;
+  normal_hyd_pressure_in : int;
+  alt_hyd_pressure_in : int;
+  time : real
+) returns (
+
+);
+var
+  __ASSUME__HIST : bool;
+  __GUARANTEE0 : bool;
+let
+  --%MAIN;
+  __ASSUME__HIST = (brake_actuator____ASSUME__HIST and (alt_hyd_piston____ASSUME__HIST and (alt_hyd_fuse____ASSUME__HIST and (normal_hyd_piston____ASSUME__HIST and (normal_hyd_fuse____ASSUME__HIST and true)))));
+
+  __GUARANTEE0 = (true -> ((brake_force > 0) = ((normal_hyd_pressure_in > 0) or (alt_hyd_pressure_in > 0))));
+
+  assert (time = normal_hyd_fuse__time);
+
+  assert _TOP__normal_hyd_fuse(normal_hyd_fuse____ASSUME__HIST, normal_hyd_fuse__hyd_pressure_in, normal_hyd_fuse__time, normal_hyd_fuse__hyd_pressure_out);
+
+  assert (normal_hyd_fuse____ASSUME__HIST = __HIST(true));
+
+  assert (time = normal_hyd_piston__time);
+
+  assert _TOP__normal_hyd_piston(normal_hyd_piston____ASSUME__HIST, normal_hyd_piston__hyd_pressure_in, normal_hyd_piston__time, normal_hyd_piston__force_out);
+
+  assert (normal_hyd_piston____ASSUME__HIST = __HIST(true));
+
+  assert (time = alt_hyd_fuse__time);
+
+  assert _TOP__alt_hyd_fuse(alt_hyd_fuse____ASSUME__HIST, alt_hyd_fuse__hyd_pressure_in, alt_hyd_fuse__time, alt_hyd_fuse__hyd_pressure_out);
+
+  assert (alt_hyd_fuse____ASSUME__HIST = __HIST(true));
+
+  assert (time = alt_hyd_piston__time);
+
+  assert _TOP__alt_hyd_piston(alt_hyd_piston____ASSUME__HIST, alt_hyd_piston__hyd_pressure_in, alt_hyd_piston__time, alt_hyd_piston__force_out);
+
+  assert (alt_hyd_piston____ASSUME__HIST = __HIST(true));
+
+  assert (time = brake_actuator__time);
+
+  assert _TOP__brake_actuator(brake_actuator____ASSUME__HIST, brake_actuator__normal_force_in, brake_actuator__alternate_force_in, brake_actuator__time, brake_actuator__fail_value, brake_actuator__braking_force);
+
+  assert (brake_actuator____ASSUME__HIST = __HIST(true));
+
+  assert (normal_hyd_pressure_in = normal_hyd_fuse__hyd_pressure_in);
+
+  assert (normal_hyd_fuse__hyd_pressure_out = normal_hyd_piston__hyd_pressure_in);
+
+  assert (alt_hyd_pressure_in = alt_hyd_fuse__hyd_pressure_in);
+
+  assert (alt_hyd_fuse__hyd_pressure_out = alt_hyd_piston__hyd_pressure_in);
+
+  assert (normal_hyd_piston__force_out = brake_actuator__normal_force_in);
+
+  assert (alt_hyd_piston__force_out = brake_actuator__alternate_force_in);
+
+  assert (brake_actuator__braking_force = brake_force);
+
+  assert true;
+
+  assert (((time = 0.0) -> (time > (pre time))) and (true -> (time = ((pre time) + (time - (pre time))))));
+
+  --%PROPERTY __ASSUME__HIST;
+  --%PROPERTY __GUARANTEE0;
+
+tel;
+
+node __HIST(
+  input : bool
+) returns (
+  hist : bool
+);
+let
+  hist = (input -> ((pre hist) and input));
+
+tel;
+
+node __MinPos(
+  a : real;
+  b : real
+) returns (
+  ret : real
+);
+let
+  ret = (if (a <= 0.0) then b else (if (b <= 0.0) then a else (if (a <= b) then a else b)));
+
+tel;
+
+node __Rise(
+  input : bool
+) returns (
+  output : bool
+);
+let
+  output = (input -> ((pre (not input)) and input));
+
+tel;
+
+node __Fall(
+  input : bool
+) returns (
+  output : bool
+);
+let
+  output = ((not input) -> ((pre input) and (not input)));
+
+tel;
+

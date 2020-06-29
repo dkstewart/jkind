@@ -13,36 +13,39 @@ type Base_Types__Float = real;
 type Base_Types__Float_32 = real;
 type Base_Types__Float_64 = real;
 
-node _TOP__temp(
+node _TOP__sensors(
   __ASSUME__HIST : bool;
   __ASSUME0 : bool;
   env_temp : int;
   time : real;
-  high_temp_indicator : bool;
-  temp_reading : int
+  temp_read : int;
+  temp_high : bool
 ) returns (
   __ASSERT : bool
 );
 var
   __GUARANTEE0 : bool;
+  __GUARANTEE1 : bool;
 let
-  __GUARANTEE0 = (((env_temp > 8) = high_temp_indicator) and (env_temp = temp_reading));
+  __GUARANTEE0 = ((env_temp > 8) = temp_high);
 
-  __ASSERT = ((__ASSUME__HIST => __GUARANTEE0) and (__ASSUME0 = ((env_temp > 0) and (env_temp < 10))));
+  __GUARANTEE1 = (env_temp = temp_read);
 
-  --%IVC __GUARANTEE0;
+  __ASSERT = ((__ASSUME__HIST => (__GUARANTEE1 and __GUARANTEE0)) and (__ASSUME0 = ((env_temp > 0) and (env_temp < 10))));
+
+  --%IVC __GUARANTEE0, __GUARANTEE1;
 
 tel;
 
 node main(
-  temp__high_temp_indicator : bool;
-  temp__temp_reading : int;
-  temp____ASSUME0 : bool;
-  temp____ASSUME__HIST : bool;
-  temp_read : int;
-  temp_high : bool;
-  temp__env_temp : int;
-  temp__time : real;
+  sensors__temp_read : int;
+  sensors__temp_high : bool;
+  sensors____ASSUME0 : bool;
+  sensors____ASSUME__HIST : bool;
+  temp_sensor_high : bool;
+  pressure_sensor_high : bool;
+  sensors__env_temp : int;
+  sensors__time : real;
   env_temp : int;
   time : real
 ) returns (
@@ -56,29 +59,27 @@ let
   --%MAIN;
   __ASSUME0 = ((env_temp > 0) and (env_temp < 10));
 
-  __ASSUME__HIST = (temp____ASSUME__HIST and true);
+  __ASSUME__HIST = (sensors____ASSUME__HIST and true);
 
-  __GUARANTEE0 = (((env_temp > 8) = temp_high) and (env_temp = temp_read));
+  __GUARANTEE0 = ((env_temp > 8) = temp_sensor_high);
 
   assert __ASSUME0;
 
-  assert (time = temp__time);
+  assert (time = sensors__time);
 
-  assert _TOP__temp(temp____ASSUME__HIST, temp____ASSUME0, temp__env_temp, temp__time, temp__high_temp_indicator, temp__temp_reading);
+  assert _TOP__sensors(sensors____ASSUME__HIST, sensors____ASSUME0, sensors__env_temp, sensors__time, sensors__temp_read, sensors__temp_high);
 
-  assert (temp____ASSUME__HIST = __HIST(temp____ASSUME0));
+  assert (sensors____ASSUME__HIST = __HIST(sensors____ASSUME0));
 
-  assert (env_temp = temp__env_temp);
+  assert (env_temp = sensors__env_temp);
 
-  assert (temp__temp_reading = temp_read);
-
-  assert (temp__high_temp_indicator = temp_high);
+  assert (sensors__temp_high = temp_sensor_high);
 
   assert true;
 
   assert (((time = 0.0) -> (time > (pre time))) and (true -> (time = ((pre time) + (time - (pre time))))));
 
-  --%PROPERTY temp____ASSUME0;
+  --%PROPERTY sensors____ASSUME0;
   --%PROPERTY __ASSUME__HIST;
   --%PROPERTY __GUARANTEE0;
 

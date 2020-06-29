@@ -11,10 +11,10 @@ public class Node extends Ast {
 	public final List<VarDecl> inputs;
 	public final List<VarDecl> outputs;
 	public final List<VarDecl> locals;
-	public final List<Equation> equations;
+	public List<Equation> equations;
 	public final List<String> properties;
 	public final List<Expr> assertions;
-	public final List<String> ivc;
+	public List<String> ivc;
 	public final List<String> realizabilityInputs; // Nullable
 	public final Contract contract; // Nullable
 
@@ -30,7 +30,7 @@ public class Node extends Ast {
 		this.equations = Util.safeList(equations);
 		this.properties = Util.safeList(properties);
 		this.assertions = Util.safeList(assertions);
-		this.ivc = Util.safeList(ivc); 
+		this.ivc = Util.safeList(ivc);
 		this.realizabilityInputs = Util.safeNullableList(realizabilityInputs);
 		this.contract = contract;
 	}
@@ -40,6 +40,14 @@ public class Node extends Ast {
 			List<String> realizabilityInputs, Contract contract, List<String> ivc) {
 		this(Location.NULL, id, inputs, outputs, locals, equations, properties, assertions,
 				realizabilityInputs, contract, ivc);
+	}
+
+	public void resetEquation(List<Equation> newEq) {
+		this.equations = newEq;
+	}
+
+	public void resetIVC(List<String> newIVC) {
+		this.ivc = newIVC;
 	}
 
 	@Override
