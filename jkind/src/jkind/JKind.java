@@ -37,10 +37,10 @@ public class JKind {
 			 */
 			Program transProgram = Translate.translate(program); // In transProgram the constants are missing
 			Program newProgram = new Program(transProgram.location, transProgram.types, program.constants, transProgram.functions, transProgram.nodes, transProgram.main); // Adding the constants and types
-			Specification userSpec = new Specification(newProgram, settings.slicing); // userSpec with constants and types
-			// Perform decomposition on equations
-			Granularity gran = new Granularity(program);
+			Granularity gran = new Granularity(newProgram);
 			Program decomposedProgram = gran.decomposeProgram();
+			Specification userSpec = new Specification(decomposedProgram, settings.slicing);
+//			Specification userSpec = new Specification(newProgram, settings.slicing); // userSpec with constants and types
 			Specification analysisSpec = getAnalysisSpec(userSpec, settings);
 
 //			int exitCode = new Director(settings, userSpec, analysisSpec).run();

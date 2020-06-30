@@ -8,10 +8,12 @@ import jkind.lustre.BinaryOp;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.IdExpr;
+import jkind.lustre.NamedType;
 import jkind.lustre.Node;
 import jkind.lustre.Program;
 import jkind.lustre.UnaryExpr;
 import jkind.lustre.UnaryOp;
+import jkind.lustre.VarDecl;
 
 public class Granularity {
 	private Program program;
@@ -28,12 +30,16 @@ public class Granularity {
 	public Program decomposeProgram() {
 		for (Node n : program.nodes) {
 			for (Equation e : n.equations) {
-				removeEqs.add(e);
-				createFreshVars(e);
+				// check lhs of equation for local vars with bool type
+				if (okayType(n, e)) {
+					removeEqs.add(e);
+					createFreshVars(e);
+				}
 			}
 			addEquations(n);
 			addIVCs(n);
-			resetLocals();
+			addLocals(n);
+			resetGlobals();
 		}
 		return program;
 	}
@@ -116,10 +122,14 @@ public class Granularity {
 	private Expr unInlineUnary(UnaryExpr unEx) {
 		Expr finalExpr = null;
 		if (isSafeBoolUnaryOp(unEx.op)) {
-			IdExpr idUnary = new IdExpr("FRESHVAR" + unique);
-			unique++;
-			finalExpr = new UnaryExpr(unEx.op, idUnary);
-			unInline(unEx.expr, idUnary);
+			if ((unEx.expr instanceof UnaryExpr) || (unEx.expr instanceof BinaryExpr)) {
+				IdExpr idUnary = new IdExpr("FRESHVAR" + unique);
+				unique++;
+				finalExpr = new UnaryExpr(unEx.op, idUnary);
+				unInline(unEx.expr, idUnary);
+			} else {
+				finalExpr = unEx;
+			}
 		} else {
 			finalExpr = unEx;
 		}
@@ -150,7 +160,7 @@ public class Granularity {
 	}
 
 	private boolean isSafeBoolUnaryOp(UnaryOp op) {
-		if (op.equals(UnaryOp.NOT) || op.equals(UnaryOp.PRE)) {
+		if (op.equals(UnaryOp.NOT)) {
 			return true;
 		} else {
 			return false;
@@ -159,11 +169,11 @@ public class Granularity {
 
 	private void addIVCs(Node n) {
 		List<String> newIVCs = new ArrayList<String>();
-		for (String s : n.ivc) {
-			newIVCs.add(s);
-		}
+//		for (String s : n.ivc) {
+//			newIVCs.add(s);
+//		}
 		for (Equation id : freshVars) {
-			newIVCs.add(id.toString());
+			newIVCs.add(id.lhs.get(0).toString());
 		}
 		n.resetIVC(newIVCs);
 	}
@@ -180,7 +190,32 @@ public class Granularity {
 		n.resetEquation(newEqs);
 	}
 
-	private void resetLocals() {
+	private void addLocals(Node n) {
+		List<VarDecl> newLocals = new ArrayList<VarDecl>();
+		for (VarDecl var : n.locals) {
+			newLocals.add(var);
+		}
+		for (Equation f : freshVars) {
+			VarDecl v = new VarDecl(f.lhs.get(0).toString(), NamedType.BOOL);
+			newLocals.add(v);
+		}
+		n.resetLocals(newLocals);
+	}
+
+	private boolean okayType(Node n, Equation e) {
+		boolean isBoolean = false;
+		for (VarDecl vd : n.locals) {
+			if (vd.id.equals(e.lhs.get(0).toString())) {
+				if (vd.type.toString().equals("bool")) {
+					return true;
+				}
+			}
+		}
+
+		return isBoolean;
+	}
+
+	private void resetGlobals() {
 		unique = 0;
 		newEquations.clear();
 		removeEqs.clear();

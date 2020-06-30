@@ -25,15 +25,18 @@ node _TOP__sensors(
 );
 var
   __GUARANTEE0 : bool;
-  __GUARANTEE1 : bool;
+  -- __GUARANTEE1 : bool;
 let
-  __GUARANTEE0 = ((env_temp > 8) = temp_high);
+  __GUARANTEE0 = (((env_temp > 8) = temp_high) and (env_temp = temp_read));
 
-  __GUARANTEE1 = (env_temp = temp_read);
+  -- __GUARANTEE1 = (env_temp = temp_read);
 
-  __ASSERT = ((__ASSUME__HIST => (__GUARANTEE1 and __GUARANTEE0)) and (__ASSUME0 = ((env_temp > 0) and (env_temp < 10))));
+  -- __ASSERT = ((__ASSUME__HIST => (__GUARANTEE1 and __GUARANTEE0)) and (__ASSUME0 = ((env_temp > 0) and (env_temp < 10))));
 
-  --%IVC __GUARANTEE0, __GUARANTEE1;
+  __ASSERT = ((__ASSUME__HIST => (__GUARANTEE0)) and (__ASSUME0 = ((env_temp > 0) and (env_temp < 10))));
+
+
+  --%IVC __GUARANTEE0;
 
 tel;
 

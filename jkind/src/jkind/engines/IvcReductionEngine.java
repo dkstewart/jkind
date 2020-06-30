@@ -45,7 +45,8 @@ public class IvcReductionEngine extends SolverBasedEngine {
 		super(NAME, specif, settings, director);
 
 		List<String> newIvc = new ArrayList<>(spec.node.ivc);
-		if(settings.allAssigned){
+		boolean allAssigned = false;
+		if (allAssigned) {
 			newIvc = new ArrayList<>();
 			newIvc.addAll(Util.getIds(spec.node.locals));
 			newIvc.addAll(Util.getIds(spec.node.outputs));

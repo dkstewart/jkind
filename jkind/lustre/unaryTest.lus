@@ -1,17 +1,21 @@
 node top(
   m : bool;
-  s : bool
+  s : bool;
+  p : bool;
+  q : bool
 ) returns (
   OK : bool
 );
 var
   a : bool;
   b : bool;
+  c : bool;
 let
   OK = (not(a and b));
 
-  a = not(m and s);
-  b = m and s;
+  a = (not(m and s) and c);
+  b = (m and s);
+  c = (p or q);
 
   --%PROPERTY OK;
 

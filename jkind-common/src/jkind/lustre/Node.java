@@ -10,7 +10,7 @@ public class Node extends Ast {
 	public final String id;
 	public final List<VarDecl> inputs;
 	public final List<VarDecl> outputs;
-	public final List<VarDecl> locals;
+	public List<VarDecl> locals;
 	public List<Equation> equations;
 	public final List<String> properties;
 	public final List<Expr> assertions;
@@ -48,6 +48,10 @@ public class Node extends Ast {
 
 	public void resetIVC(List<String> newIVC) {
 		this.ivc = newIVC;
+	}
+
+	public void resetLocals(List<VarDecl> newLocals) {
+		this.locals = newLocals;
 	}
 
 	@Override
