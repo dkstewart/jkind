@@ -10,14 +10,14 @@ import jkind.lustre.Expr;
 import jkind.lustre.IdExpr;
 import jkind.lustre.Node;
 import jkind.lustre.Program;
+import jkind.lustre.UnaryExpr;
+import jkind.lustre.UnaryOp;
 
 public class Granularity {
 	private Program program;
-//	private Program newProgram = null;
 	private List<Equation> freshVars = new ArrayList<Equation>();
 	private List<Equation> removeEqs = new ArrayList<Equation>();
-	private List<Equation> newGuarantees = new ArrayList<Equation>();
-//	private List<String> removeIVCs = new ArrayList<String>();
+	private List<Equation> newEquations = new ArrayList<Equation>();
 	private static int unique = 0;
 
 	public Granularity(Program program) {
@@ -28,17 +28,15 @@ public class Granularity {
 	public Program decomposeProgram() {
 		for (Node n : program.nodes) {
 			for (Equation e : n.equations) {
-				if (e.lhs.toString().contains("GUARANTEE")) {
+//				if (e.lhs.toString().contains("GUARANTEE")) {
 					removeEqs.add(e);
 					createFreshVars(e);
-				}
+//				}
 			}
-			// Remove unnecessary equations
-			// Add new fresh vars to ivc list
 			addEquations(n);
 			addIVCs(n);
+			resetLocals();
 		}
-
 		return program;
 	}
 
@@ -60,22 +58,31 @@ public class Granularity {
 				newEqs.add(e);
 			}
 		}
-		newEqs.addAll(newGuarantees);
+		newEqs.addAll(newEquations);
 		newEqs.addAll(freshVars);
 		n.resetEquation(newEqs);
+	}
+
+	private void resetLocals() {
+		unique = 0;
+		newEquations.clear();
+		removeEqs.clear();
+		freshVars.clear();
 	}
 
 	private void createFreshVars(Equation e) {
 		// Init process
 		if (e.expr instanceof BinaryExpr) {
 			BinaryExpr binEx = (BinaryExpr) e.expr;
-			if (isSafeBoolOp(binEx.op)) {
+			if (isSafeBoolBinaryOp(binEx.op)) {
 				IdExpr id = new IdExpr("FRESHVAR" + unique);
 				unique++;
-				newGuarantees.add(new Equation(e.lhs, id));
+				newEquations.add(new Equation(e.lhs, id));
 				removeEqs.add(e);
 				unInline(binEx, id);
 			}
+		} else if (e.expr instanceof UnaryExpr) {
+			// test for safe op, etc.
 		}
 
 	}
@@ -86,30 +93,31 @@ public class Granularity {
 		Expr finalLeft;
 		Expr finalRight;
 		// Check left for binary with safe operator
-		if (expr.left instanceof jkind.lustre.BinaryExpr) {
-			jkind.lustre.BinaryExpr leftEx = (jkind.lustre.BinaryExpr) expr.left;
-			if (isSafeBoolOp(leftEx.op)) {
-				IdExpr idL = new IdExpr("FRESHVAR" + unique);
-				unique++;
-				finalLeft = idL;
-				unInline(leftEx, idL);
-			} else {
-				finalLeft = leftEx;
-			}
+		if (expr.left instanceof BinaryExpr) {
+			finalLeft = unInlineBinary((BinaryExpr) expr.left);
+//			if (isSafeBoolOp(leftEx.op)) {
+//				IdExpr idL = new IdExpr("FRESHVAR" + unique);
+//				unique++;
+//				finalLeft = idL;
+//				unInline(leftEx, idL);
+//			} else {
+//				finalLeft = leftEx;
+//			}
 		} else {
 			finalLeft = expr.left;
 		}
 		// Check right for binary with safe operator
 		if (expr.right instanceof BinaryExpr) {
-			BinaryExpr rightEx = (BinaryExpr) expr.right;
-			if (isSafeBoolOp(rightEx.op)) {
-				IdExpr idR = new IdExpr("freshVar" + unique);
-				unique++;
-				finalRight = idR;
-				unInline(rightEx, idR);
-			} else {
-				finalRight = rightEx;
-			}
+			finalRight = unInlineBinary((BinaryExpr) expr.right);
+
+//			if (isSafeBoolOp(rightEx.op)) {
+//				IdExpr idR = new IdExpr("FRESHVAR" + unique);
+//				unique++;
+//				finalRight = idR;
+//				unInline(rightEx, idR);
+//			} else {
+//				finalRight = rightEx;
+//			}
 		} else {
 			finalRight = expr.right;
 		}
@@ -118,6 +126,33 @@ public class Granularity {
 		freshVars.add(new Equation(fresh, new BinaryExpr(finalLeft, expr.op, finalRight)));
 
 	}
+
+	private Expr unInlineBinary(BinaryExpr binEx) {
+		Expr finalExpr = null;
+		if (isSafeBoolBinaryOp(binEx.op)) {
+			IdExpr idR = new IdExpr("FRESHVAR" + unique);
+			unique++;
+			finalExpr = idR;
+			unInline(binEx, idR);
+		} else {
+			finalExpr = binEx;
+		}
+		return finalExpr;
+	}
+
+//	private Expr unInlineUnary(UnaryExpr unEx) {
+//		Expr finalExpr = null;
+//		if (isSafeBoolUnaryOp(unEx.op)) {
+//			IdExpr idUnary = new IdExpr("FRESHVAR" + unique);
+//			unique++;
+//			finalExpr = new UnaryExpr(unEx.op, idUnary);
+//			unInline(unEx.expr, idUnary);
+//		} else {
+//			finalExpr = unEx;
+//		}
+//
+//		return finalExpr;
+//	}
 
 	private List<Equation> deepCopyWithRemoval(List<Equation> equations, List<Equation> removal) {
 		List<Equation> newList = new ArrayList<Equation>();
@@ -129,11 +164,20 @@ public class Granularity {
 		return newList;
 	}
 
-	private static boolean isSafeBoolOp(BinaryOp op) {
+	private static boolean isSafeBoolBinaryOp(BinaryOp op) {
 		if (op.equals(BinaryOp.EQUAL) || op.equals(BinaryOp.NOTEQUAL) || op.equals(BinaryOp.GREATER)
 				|| op.equals(BinaryOp.LESS) || op.equals(BinaryOp.GREATEREQUAL) || op.equals(BinaryOp.LESSEQUAL)
 				|| op.equals(BinaryOp.OR) || op.equals(BinaryOp.AND) || op.equals(BinaryOp.XOR)
-				|| op.equals(BinaryOp.IMPLIES) || op.equals(BinaryOp.ARROW)) {
+				|| op.equals(BinaryOp.IMPLIES) || op.equals(BinaryOp.ARROW) || op.equals(UnaryOp.NOT)
+				|| op.equals(UnaryOp.PRE)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean isSafeBoolUnaryOp(UnaryOp op) {
+		if (op.equals(UnaryOp.NOT) || op.equals(UnaryOp.PRE)) {
 			return true;
 		} else {
 			return false;
