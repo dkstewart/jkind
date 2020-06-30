@@ -28,16 +28,133 @@ public class Granularity {
 	public Program decomposeProgram() {
 		for (Node n : program.nodes) {
 			for (Equation e : n.equations) {
-//				if (e.lhs.toString().contains("GUARANTEE")) {
-					removeEqs.add(e);
-					createFreshVars(e);
-//				}
+				removeEqs.add(e);
+				createFreshVars(e);
 			}
 			addEquations(n);
 			addIVCs(n);
 			resetLocals();
 		}
 		return program;
+	}
+
+	private void createFreshVars(Equation e) {
+		// Init process
+		if (e.expr instanceof BinaryExpr) {
+			BinaryExpr binEx = (BinaryExpr) e.expr;
+			if (isSafeBoolBinaryOp(binEx.op)) {
+				IdExpr id = new IdExpr("FRESHVAR" + unique);
+				unique++;
+				newEquations.add(new Equation(e.lhs, id));
+				removeEqs.add(e);
+				unInline(binEx, id);
+			}
+		} else if (e.expr instanceof UnaryExpr) {
+			UnaryExpr unEx = (UnaryExpr) e.expr;
+			if (isSafeBoolUnaryOp(unEx.op)) {
+				IdExpr id = new IdExpr("FRESHVAR" + unique);
+				unique++;
+				newEquations.add(new Equation(e.lhs, id));
+				removeEqs.add(e);
+//				freshVars.add(new Equation(id, new UnaryExpr(unEx.op, unInline(unEx.expr, ))));
+				unInline(unEx, id);
+			}
+		}
+
+	}
+
+	private void unInline(Expr ex, IdExpr fresh) {
+		// // We know expr is binary or unary with safe bool operator
+		// and originalEquation = fresh, but fresh is not assigned yet.
+		Expr finalLeft;
+		Expr finalRight;
+		Expr finalUnary;
+		// Binary case
+		if (ex instanceof BinaryExpr) {
+			BinaryExpr expr = (BinaryExpr) ex;
+			// Check left for binary/unary case
+			if (expr.left instanceof BinaryExpr) {
+				finalLeft = unInlineBinary((BinaryExpr) expr.left);
+			} else if (expr.left instanceof UnaryExpr) {
+				finalLeft = unInlineUnary((UnaryExpr) expr.left);
+			} else {
+				finalLeft = expr.left;
+			}
+			// Check right for binary/unary case
+			if (expr.right instanceof BinaryExpr) {
+				finalRight = unInlineBinary((BinaryExpr) expr.right);
+			} else if (expr.right instanceof UnaryExpr) {
+				finalRight = unInlineUnary((UnaryExpr) expr.right);
+			} else {
+				finalRight = expr.right;
+			}
+			// Now, finalLeft and finalRight should be assigned to 'fresh'
+			// and given the top level operator
+			freshVars.add(new Equation(fresh, new BinaryExpr(finalLeft, expr.op, finalRight)));
+		} else if (ex instanceof UnaryExpr) {
+			UnaryExpr unExpr = (UnaryExpr) ex;
+			finalUnary = unInlineUnary(unExpr);
+			freshVars.add(new Equation(fresh, finalUnary));
+		}
+
+
+	}
+
+	private Expr unInlineBinary(BinaryExpr binEx) {
+		Expr finalExpr = null;
+		if (isSafeBoolBinaryOp(binEx.op)) {
+			IdExpr idR = new IdExpr("FRESHVAR" + unique);
+			unique++;
+			finalExpr = idR;
+			unInline(binEx, idR);
+		} else {
+			finalExpr = binEx;
+		}
+		return finalExpr;
+	}
+
+	private Expr unInlineUnary(UnaryExpr unEx) {
+		Expr finalExpr = null;
+		if (isSafeBoolUnaryOp(unEx.op)) {
+			IdExpr idUnary = new IdExpr("FRESHVAR" + unique);
+			unique++;
+			finalExpr = new UnaryExpr(unEx.op, idUnary);
+			unInline(unEx.expr, idUnary);
+		} else {
+			finalExpr = unEx;
+		}
+
+		return finalExpr;
+	}
+
+	private List<Equation> deepCopyWithRemoval(List<Equation> equations, List<Equation> removal) {
+		List<Equation> newList = new ArrayList<Equation>();
+		for (Equation e : equations) {
+			if (!(removal.contains(e))) {
+				newList.add(e);
+			}
+		}
+		return newList;
+	}
+
+	private static boolean isSafeBoolBinaryOp(BinaryOp op) {
+		if (op.equals(BinaryOp.EQUAL) || op.equals(BinaryOp.NOTEQUAL) || op.equals(BinaryOp.GREATER)
+				|| op.equals(BinaryOp.LESS) || op.equals(BinaryOp.GREATEREQUAL) || op.equals(BinaryOp.LESSEQUAL)
+				|| op.equals(BinaryOp.OR) || op.equals(BinaryOp.AND) || op.equals(BinaryOp.XOR)
+				|| op.equals(BinaryOp.IMPLIES) || op.equals(BinaryOp.ARROW) || op.equals(UnaryOp.NOT)
+				|| op.equals(UnaryOp.PRE)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean isSafeBoolUnaryOp(UnaryOp op) {
+		if (op.equals(UnaryOp.NOT) || op.equals(UnaryOp.PRE)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private void addIVCs(Node n) {
@@ -68,119 +185,5 @@ public class Granularity {
 		newEquations.clear();
 		removeEqs.clear();
 		freshVars.clear();
-	}
-
-	private void createFreshVars(Equation e) {
-		// Init process
-		if (e.expr instanceof BinaryExpr) {
-			BinaryExpr binEx = (BinaryExpr) e.expr;
-			if (isSafeBoolBinaryOp(binEx.op)) {
-				IdExpr id = new IdExpr("FRESHVAR" + unique);
-				unique++;
-				newEquations.add(new Equation(e.lhs, id));
-				removeEqs.add(e);
-				unInline(binEx, id);
-			}
-		} else if (e.expr instanceof UnaryExpr) {
-			// test for safe op, etc.
-		}
-
-	}
-
-	private void unInline(BinaryExpr expr, IdExpr fresh) {
-		// // We know expr is binary with safe bool operator
-		// and guar : fresh, but fresh is not assigned yet.
-		Expr finalLeft;
-		Expr finalRight;
-		// Check left for binary with safe operator
-		if (expr.left instanceof BinaryExpr) {
-			finalLeft = unInlineBinary((BinaryExpr) expr.left);
-//			if (isSafeBoolOp(leftEx.op)) {
-//				IdExpr idL = new IdExpr("FRESHVAR" + unique);
-//				unique++;
-//				finalLeft = idL;
-//				unInline(leftEx, idL);
-//			} else {
-//				finalLeft = leftEx;
-//			}
-		} else {
-			finalLeft = expr.left;
-		}
-		// Check right for binary with safe operator
-		if (expr.right instanceof BinaryExpr) {
-			finalRight = unInlineBinary((BinaryExpr) expr.right);
-
-//			if (isSafeBoolOp(rightEx.op)) {
-//				IdExpr idR = new IdExpr("FRESHVAR" + unique);
-//				unique++;
-//				finalRight = idR;
-//				unInline(rightEx, idR);
-//			} else {
-//				finalRight = rightEx;
-//			}
-		} else {
-			finalRight = expr.right;
-		}
-		// Now, finalLeft and finalRight should be assigned to 'fresh'
-		// and given the top level operator
-		freshVars.add(new Equation(fresh, new BinaryExpr(finalLeft, expr.op, finalRight)));
-
-	}
-
-	private Expr unInlineBinary(BinaryExpr binEx) {
-		Expr finalExpr = null;
-		if (isSafeBoolBinaryOp(binEx.op)) {
-			IdExpr idR = new IdExpr("FRESHVAR" + unique);
-			unique++;
-			finalExpr = idR;
-			unInline(binEx, idR);
-		} else {
-			finalExpr = binEx;
-		}
-		return finalExpr;
-	}
-
-//	private Expr unInlineUnary(UnaryExpr unEx) {
-//		Expr finalExpr = null;
-//		if (isSafeBoolUnaryOp(unEx.op)) {
-//			IdExpr idUnary = new IdExpr("FRESHVAR" + unique);
-//			unique++;
-//			finalExpr = new UnaryExpr(unEx.op, idUnary);
-//			unInline(unEx.expr, idUnary);
-//		} else {
-//			finalExpr = unEx;
-//		}
-//
-//		return finalExpr;
-//	}
-
-	private List<Equation> deepCopyWithRemoval(List<Equation> equations, List<Equation> removal) {
-		List<Equation> newList = new ArrayList<Equation>();
-		for (Equation e : equations) {
-			if (!(removal.contains(e))) {
-				newList.add(e);
-			}
-		}
-		return newList;
-	}
-
-	private static boolean isSafeBoolBinaryOp(BinaryOp op) {
-		if (op.equals(BinaryOp.EQUAL) || op.equals(BinaryOp.NOTEQUAL) || op.equals(BinaryOp.GREATER)
-				|| op.equals(BinaryOp.LESS) || op.equals(BinaryOp.GREATEREQUAL) || op.equals(BinaryOp.LESSEQUAL)
-				|| op.equals(BinaryOp.OR) || op.equals(BinaryOp.AND) || op.equals(BinaryOp.XOR)
-				|| op.equals(BinaryOp.IMPLIES) || op.equals(BinaryOp.ARROW) || op.equals(UnaryOp.NOT)
-				|| op.equals(UnaryOp.PRE)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private boolean isSafeBoolUnaryOp(UnaryOp op) {
-		if (op.equals(UnaryOp.NOT) || op.equals(UnaryOp.PRE)) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 }
