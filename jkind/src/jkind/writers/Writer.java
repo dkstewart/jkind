@@ -10,6 +10,7 @@ import jkind.engines.mutation.Mutation;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.Location;
+import jkind.lustre.Node;
 import jkind.results.Counterexample;
 
 public abstract class Writer {
@@ -37,5 +38,5 @@ public abstract class Writer {
 
 	public abstract void writeGuaranteeMutation(HashMap<Equation, Mutation> guarantee_mutations);
 
-	public abstract void writeGranularityVars(List<Equation> granVars);
+	public abstract void writeGranularityVars(HashMap<Node, List<Equation>> granularity_vars);
 }

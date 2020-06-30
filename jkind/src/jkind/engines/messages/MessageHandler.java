@@ -67,4 +67,6 @@ public abstract class MessageHandler {
 
 	protected abstract void handleMessage(GuaranteeMutationMessage vm);
 
+	protected abstract void handleMessage(GranularityMessage vm);
+
 }

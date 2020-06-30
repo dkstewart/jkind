@@ -4,6 +4,7 @@ import java.util.List;
 
 import jkind.JKindSettings;
 import jkind.engines.Director;
+import jkind.engines.messages.GranularityMessage;
 import jkind.engines.messages.GuaranteeMutationMessage;
 import jkind.lustre.Expr;
 import jkind.translation.Specification;
@@ -25,5 +26,9 @@ public class GraphInvariantGenerationEngine extends AbstractInvariantGenerationE
 
 	@Override
 	protected void handleMessage(GuaranteeMutationMessage vm) {
+	}
+
+	@Override
+	protected void handleMessage(GranularityMessage vm) {
 	}
 }

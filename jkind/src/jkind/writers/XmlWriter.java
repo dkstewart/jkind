@@ -13,6 +13,7 @@ import jkind.engines.mutation.Mutation;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.Location;
+import jkind.lustre.Node;
 import jkind.lustre.Type;
 import jkind.lustre.VarDecl;
 import jkind.lustre.values.BooleanValue;
@@ -209,6 +210,6 @@ public class XmlWriter extends Writer {
 	}
 
 	@Override
-	public void writeGranularityVars(List<Equation> granVars) {
+	public void writeGranularityVars(HashMap<Node, List<Equation>> granVars) {
 	}
 }

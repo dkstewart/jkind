@@ -7,6 +7,7 @@ import jkind.advice.Advice;
 import jkind.engines.invariant.AbstractInvariantGenerationEngine;
 import jkind.engines.invariant.ListInvariant;
 import jkind.engines.invariant.StructuredInvariant;
+import jkind.engines.messages.GranularityMessage;
 import jkind.engines.messages.GuaranteeMutationMessage;
 import jkind.lustre.Expr;
 import jkind.translation.Specification;
@@ -29,5 +30,9 @@ public class AdviceEngine extends AbstractInvariantGenerationEngine {
 
 	@Override
 	protected void handleMessage(GuaranteeMutationMessage vm) {
+	}
+
+	@Override
+	protected void handleMessage(GranularityMessage vm) {
 	}
 }

@@ -4,6 +4,7 @@ import jkind.JKindException;
 import jkind.JKindSettings;
 import jkind.engines.messages.BaseStepMessage;
 import jkind.engines.messages.EngineType;
+import jkind.engines.messages.GranularityMessage;
 import jkind.engines.messages.GuaranteeMutationMessage;
 import jkind.engines.messages.InductiveCounterexampleMessage;
 import jkind.engines.messages.InvalidMessage;
@@ -137,5 +138,9 @@ public class SmoothingEngine extends SolverBasedEngine {
 
 	@Override
 	protected void handleMessage(GuaranteeMutationMessage vm) {
+	}
+
+	@Override
+	protected void handleMessage(GranularityMessage vm) {
 	}
 }

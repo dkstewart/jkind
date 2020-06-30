@@ -13,6 +13,7 @@ import jkind.engines.mutation.Mutation.Verdict;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.Location;
+import jkind.lustre.Node;
 import jkind.results.Counterexample;
 import jkind.results.layout.Layout;
 import jkind.util.Util;
@@ -170,7 +171,18 @@ public class ConsoleWriter extends Writer {
 	}
 
 	@Override
-	public void writeGranularityVars(List<Equation> granVars) {
+	public void writeGranularityVars(HashMap<Node, List<Equation>> granVars) {
+		writeLine();
+		System.out.println("Fresh Variables in Program:");
+		writeLine();
+		for (Node n : granVars.keySet()) {
+			System.out.println("For node " + n.id + ":");
+			for (Equation e : granVars.get(n)) {
+				System.out.println(e.toString());
+			}
+			System.out.println();
+		}
 
+		writeLine();
 	}
 }

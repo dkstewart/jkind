@@ -98,6 +98,6 @@ public class ExcelWriter extends Writer {
 	}
 
 	@Override
-	public void writeGranularityVars(List<Equation> granVars) {
+	public void writeGranularityVars(HashMap<Node, List<Equation>> granVars) {
 	}
 }
