@@ -21,7 +21,7 @@ public class Granularity {
 	private List<Equation> freshVars = new ArrayList<Equation>();
 	private List<Equation> removeEqs = new ArrayList<Equation>();
 	private List<Equation> newEquations = new ArrayList<Equation>();
-	private HashMap<Node, List<Equation>> mapNodeToFreshVars = new HashMap<Node, List<Equation>>();
+	private static HashMap<Node, List<Equation>> mapNodeToFreshVars = new HashMap<Node, List<Equation>>();
 	private static int unique = 0;
 
 	public Granularity(Program program) {
@@ -224,10 +224,10 @@ public class Granularity {
 		unique = 0;
 		newEquations.clear();
 		removeEqs.clear();
-		freshVars.clear();
+//		freshVars.clear();
 	}
 
-	public HashMap<Node, List<Equation>> getMapNodeToFreshVars() {
+	public static HashMap<Node, List<Equation>> getMapNodeToFreshVars() {
 		return mapNodeToFreshVars;
 	}
 }

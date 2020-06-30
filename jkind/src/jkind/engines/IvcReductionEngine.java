@@ -2,6 +2,7 @@ package jkind.engines;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -21,9 +22,11 @@ import jkind.engines.messages.MutationMessage;
 import jkind.engines.messages.NodeInputMutationMessage;
 import jkind.engines.messages.UnknownMessage;
 import jkind.engines.messages.ValidMessage;
+import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.IdExpr;
 import jkind.lustre.NamedType;
+import jkind.lustre.Node;
 import jkind.lustre.VarDecl;
 import jkind.sexp.Cons;
 import jkind.sexp.Sexp;
@@ -34,6 +37,7 @@ import jkind.solvers.UnknownResult;
 import jkind.solvers.UnsatResult;
 import jkind.translation.Lustre2Sexp;
 import jkind.translation.Specification;
+import jkind.util.Granularity;
 import jkind.util.LinkedBiMap;
 import jkind.util.SexpUtil;
 import jkind.util.Util;
@@ -41,12 +45,16 @@ import jkind.util.Util;
 public class IvcReductionEngine extends SolverBasedEngine {
 	public static final String NAME = "ivc-reduction";
 	private final LinkedBiMap<String, Symbol> ivcMap;
+	private HashMap<Node, List<Equation>> mapNodeToFreshVars;
 
 	public IvcReductionEngine(Specification specif, JKindSettings settings, Director director) {
 		super(NAME, specif, settings, director);
 
 		List<String> newIvc = new ArrayList<>(spec.node.ivc);
+
+		// Granularity settings
 		boolean allAssigned = false;
+		mapNodeToFreshVars = Granularity.getMapNodeToFreshVars();
 		if (allAssigned) {
 			newIvc = new ArrayList<>();
 			newIvc.addAll(Util.getIds(spec.node.locals));
@@ -266,6 +274,7 @@ public class IvcReductionEngine extends SolverBasedEngine {
 		comment("IVC: " + ivc.toString());
 
 		Itinerary itinerary = vm.getNextItinerary();
+		director.broadcast(new GranularityMessage(mapNodeToFreshVars));
 		director.broadcast(new ValidMessage(vm.source, valid, k, invariants, trimNode(ivc), itinerary));
 	}
 

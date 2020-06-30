@@ -176,7 +176,7 @@ public class ConsoleWriter extends Writer {
 		System.out.println("Fresh Variables in Program:");
 		writeLine();
 		for (Node n : granVars.keySet()) {
-			System.out.println("For node " + n.id + ":");
+			System.out.println("For " + n.id + " node:");
 			for (Equation e : granVars.get(n)) {
 				System.out.println(e.toString());
 			}
