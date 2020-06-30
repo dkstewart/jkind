@@ -207,4 +207,8 @@ public class XmlWriter extends Writer {
 	@Override
 	public void writeGuaranteeMutation(HashMap<Equation, Mutation> guarantee_mutations) {
 	}
+
+	@Override
+	public void writeGranularityVars(List<Equation> granVars) {
+	}
 }

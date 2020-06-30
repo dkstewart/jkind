@@ -36,4 +36,6 @@ public abstract class Writer {
 	public abstract void writeNodeInputMutation(HashMap<Expr, Mutation> node_input_mutations);
 
 	public abstract void writeGuaranteeMutation(HashMap<Equation, Mutation> guarantee_mutations);
+
+	public abstract void writeGranularityVars(List<Equation> granVars);
 }

@@ -168,4 +168,9 @@ public class ConsoleWriter extends Writer {
 		}
 		writeLine();
 	}
+
+	@Override
+	public void writeGranularityVars(List<Equation> granVars) {
+
+	}
 }
