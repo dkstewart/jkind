@@ -9,6 +9,7 @@ import jkind.lustre.BinaryOp;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.IdExpr;
+import jkind.lustre.IfThenElseExpr;
 import jkind.lustre.NamedType;
 import jkind.lustre.Node;
 import jkind.lustre.Program;
@@ -70,6 +71,13 @@ public class Granularity {
 //				freshVars.add(new Equation(id, new UnaryExpr(unEx.op, unInline(unEx.expr, ))));
 				unInline(unEx, id);
 			}
+		} else if (e.expr instanceof IfThenElseExpr) {
+			IfThenElseExpr ite = (IfThenElseExpr) e.expr;
+			IdExpr id = new IdExpr("FRESHVAR" + unique);
+			unique++;
+			newEquations.add(new Equation(e.lhs, id));
+			removeEqs.add(e);
+			unInline(ite, id);
 		}
 
 	}
@@ -80,6 +88,7 @@ public class Granularity {
 		Expr finalLeft;
 		Expr finalRight;
 		Expr finalUnary;
+		Expr finalITE;
 		// Binary case
 		if (ex instanceof BinaryExpr) {
 			BinaryExpr expr = (BinaryExpr) ex;
@@ -106,6 +115,10 @@ public class Granularity {
 			UnaryExpr unExpr = (UnaryExpr) ex;
 			finalUnary = unInlineUnary(unExpr);
 			freshVars.add(new Equation(fresh, finalUnary));
+		} else if (ex instanceof IfThenElseExpr) {
+			IfThenElseExpr ite = (IfThenElseExpr) ex;
+			finalITE = unInlineITE(ite);
+			freshVars.add(new Equation(fresh, new IfThenElseExpr(finalITE, ite.thenExpr, ite.elseExpr)));
 		}
 
 
@@ -142,6 +155,20 @@ public class Granularity {
 		return finalExpr;
 	}
 
+	private Expr unInlineITE(IfThenElseExpr ite) {
+		Expr finalExpr = null;
+		if (ite.cond instanceof BinaryExpr) {
+			return unInlineBinary((BinaryExpr) ite.cond);
+		} else if (ite.cond instanceof UnaryExpr) {
+			return unInlineUnary((UnaryExpr) ite.cond);
+		} else if (ite.cond instanceof IfThenElseExpr) {
+			return unInlineITE((IfThenElseExpr) ite.cond);
+		} else {
+			finalExpr = ite.cond;
+		}
+		return finalExpr;
+	}
+
 	private List<Equation> deepCopyWithRemoval(List<Equation> equations, List<Equation> removal) {
 		List<Equation> newList = new ArrayList<Equation>();
 		for (Equation e : equations) {
@@ -156,8 +183,7 @@ public class Granularity {
 		if (op.equals(BinaryOp.EQUAL) || op.equals(BinaryOp.NOTEQUAL) || op.equals(BinaryOp.GREATER)
 				|| op.equals(BinaryOp.LESS) || op.equals(BinaryOp.GREATEREQUAL) || op.equals(BinaryOp.LESSEQUAL)
 				|| op.equals(BinaryOp.OR) || op.equals(BinaryOp.AND) || op.equals(BinaryOp.XOR)
-				|| op.equals(BinaryOp.IMPLIES) || op.equals(BinaryOp.ARROW) || op.equals(UnaryOp.NOT)
-				|| op.equals(UnaryOp.PRE)) {
+				|| op.equals(BinaryOp.IMPLIES) || op.equals(BinaryOp.ARROW)) {
 			return true;
 		} else {
 			return false;
@@ -165,7 +191,7 @@ public class Granularity {
 	}
 
 	private boolean isSafeBoolUnaryOp(UnaryOp op) {
-		if (op.equals(UnaryOp.NOT)) {
+		if (op.equals(UnaryOp.NOT) || op.equals(UnaryOp.PRE)) {
 			return true;
 		} else {
 			return false;
@@ -224,7 +250,6 @@ public class Granularity {
 		unique = 0;
 		newEquations.clear();
 		removeEqs.clear();
-//		freshVars.clear();
 	}
 
 	public static HashMap<Node, List<Equation>> getMapNodeToFreshVars() {

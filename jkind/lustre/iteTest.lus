@@ -1,0 +1,18 @@
+node top(
+  m : bool;
+  s : bool
+) returns (
+  OK : bool
+);
+var
+  a : bool;
+  b : bool;
+let
+  OK = (not(a and b));
+
+  a = (if (not(m and s)) then true else false);
+  b = m and s;
+
+  --%PROPERTY OK;
+
+tel;
